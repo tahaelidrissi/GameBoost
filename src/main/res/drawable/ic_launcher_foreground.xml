@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:scaleX="0.6"
+        android:scaleY="0.6"
+        android:translateX="21.6"
+        android:translateY="21.6">
+
+        <!-- Icône manette de jeu stylisée -->
+        <!-- Corps de la manette -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,35 C40,35 30,45 30,55 L30,65 C30,72 35,78 42,78 L66,78 C73,78 78,72 78,65 L78,55 C78,45 68,35 54,35 Z" />
+
+        <!-- Croix directionnelle (gauche) -->
+        <path
+            android:fillColor="#2463EB"
+            android:pathData="M38,50 L38,54 L36,54 L36,58 L38,58 L38,62 L42,62 L42,58 L44,58 L44,54 L42,54 L42,50 Z" />
+
+        <!-- Boutons (droite) -->
+        <path
+            android:fillColor="#9333EA"
+            android:pathData="M64,52 a3,3 0 1,1 0,6 a3,3 0 1,1 0,-6 Z" />
+        <path
+            android:fillColor="#9333EA"
+            android:pathData="M70,52 a3,3 0 1,1 0,6 a3,3 0 1,1 0,-6 Z" />
+
+        <!-- Détails supplémentaires -->
+        <path
+            android:fillColor="#E0E0E0"
+            android:pathData="M48,40 L60,40 C62,40 62,42 60,42 L48,42 C46,42 46,40 48,40 Z" />
+    </group>
+</vector>

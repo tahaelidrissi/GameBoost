@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!--
+       Spécifie les fichiers à inclure/exclure lors de la sauvegarde automatique.
+       Documentation: https://developer.android.com/guide/topics/data/autobackup
+    -->
+
+    <!-- Exclure les fichiers de cache -->
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="file" path="." />
+
+    <!-- Inclure uniquement les préférences importantes -->
+    <include domain="sharedpref" path="gamecoach_prefs.xml" />
+</full-backup-content>
