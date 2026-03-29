@@ -47,13 +47,13 @@ fun SplashScreen(navController: NavController) {
         ) {
             Icon(
                 imageVector = Icons.Default.SportsEsports,
-                contentDescription = "GameCoach Logo",
+                contentDescription = "GameBoost Logo",
                 modifier = Modifier.size(120.dp),
                 tint = Color.White
             )
 
             Text(
-                text = "GameCoach",
+                text = "GameBoost",
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White

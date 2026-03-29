@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -15,15 +16,21 @@ import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.navigation.Screen
 import com.gamecoach.ui.theme.*
-import com.gamecoach.util.Constants
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RequestSessionScreen(navController: NavController) {
+fun RequestSessionScreen(navController: NavController, email: String = "joueur@test.com") {
     var selectedDuration by remember { mutableStateOf(1) }
     var selectedDate by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
+    
     var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
+    val datePickerState = rememberDatePickerState()
+    val timePickerState = rememberTimePickerState()
 
     val totalAmount = 35.0 * selectedDuration
 
@@ -31,38 +38,13 @@ fun RequestSessionScreen(navController: NavController) {
         topBar = {
             GameCoachTopBar(
                 title = "Demander une session",
-                onBackClick = { navController.navigateUp() }
-            )
-        },
-        bottomBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shadowElevation = 8.dp
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Total:", fontWeight = FontWeight.Bold)
-                        Text(
-                            "$${totalAmount}",
-                            fontWeight = FontWeight.Bold,
-                            color = Success
-                        )
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.PlayerHome.createRoute(email)) {
+                        popUpTo(Screen.PlayerHome.route) { inclusive = true }
                     }
-                    GameCoachButton(
-                        text = "Confirmer la demande",
-                        onClick = {
-                            // TODO: Créer la session
-                            navController.navigate(Screen.PlayerSessions.route)
-                        }
-                    )
                 }
-            }
+            )
         }
     ) { padding ->
         Column(
@@ -74,7 +56,7 @@ fun RequestSessionScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Durée
-            Card {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -85,18 +67,23 @@ fun RequestSessionScreen(navController: NavController) {
                         fontWeight = FontWeight.Bold
                     )
 
-                    Constants.SESSION_DURATIONS.forEach { duration ->
-                        FilterChip(
-                            selected = selectedDuration == duration,
-                            onClick = { selectedDuration = duration },
-                            label = { Text("$duration heure${if (duration > 1) "s" else ""}") }
-                        )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), 
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(1, 2, 3, 4, 5).forEach { duration ->
+                            FilterChip(
+                                selected = selectedDuration == duration,
+                                onClick = { selectedDuration = duration },
+                                label = { Text("$duration h") }
+                            )
+                        }
                     }
                 }
             }
 
             // Date
-            Card {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -108,7 +95,7 @@ fun RequestSessionScreen(navController: NavController) {
                     )
 
                     OutlinedButton(
-                        onClick = { /* TODO: Picker */ },
+                        onClick = { showDatePicker = true },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.CalendarToday, contentDescription = null)
@@ -119,7 +106,7 @@ fun RequestSessionScreen(navController: NavController) {
             }
 
             // Heure
-            Card {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -131,7 +118,7 @@ fun RequestSessionScreen(navController: NavController) {
                     )
 
                     OutlinedButton(
-                        onClick = { /* TODO: Time Picker */ },
+                        onClick = { showTimePicker = true },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.AccessTime, contentDescription = null)
@@ -140,6 +127,86 @@ fun RequestSessionScreen(navController: NavController) {
                     }
                 }
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Total et Confirmation
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Total:", fontWeight = FontWeight.Bold)
+                        Text(
+                            "${totalAmount}€",
+                            fontWeight = FontWeight.Bold,
+                            color = Success
+                        )
+                    }
+                    GameCoachButton(
+                        text = "Confirmer la demande",
+                        onClick = {
+                            navController.navigate(Screen.PlayerSessions.route)
+                        }
+                    )
+                }
+            }
         }
+    }
+
+    // Date Picker Dialog
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        val date = Date(it)
+                        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        selectedDate = formatter.format(date)
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("Confirmer")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Annuler")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    // Time Picker Dialog
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    selectedTime = String.format(Locale.getDefault(), "%02d:%02d", timePickerState.hour, timePickerState.minute)
+                    showTimePicker = false
+                }) {
+                    Text("Confirmer")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) {
+                    Text("Annuler")
+                }
+            },
+            text = {
+                TimePicker(state = timePickerState)
+            }
+        )
     }
 }

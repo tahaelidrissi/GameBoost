@@ -5,12 +5,16 @@ sealed class Screen(val route: String) {
     object Splash : Screen("splash")
     object Login : Screen("login")
     object Register : Screen("register")
-    object Profile : Screen("profile")
+    object Profile : Screen("profile?email={email}") {
+        fun createRoute(email: String) = "profile?email=$email"
+    }
     object EditProfile : Screen("edit_profile")
     object Settings : Screen("settings")
 
     // Player
-    object PlayerHome : Screen("player_home")
+    object PlayerHome : Screen("player_home?email={email}") {
+        fun createRoute(email: String) = "player_home?email=$email"
+    }
     object CoachList : Screen("coach_list")
     object CoachDetail : Screen("coach_detail/{coachId}") {
         fun createRoute(coachId: String) = "coach_detail/$coachId"
@@ -34,9 +38,13 @@ sealed class Screen(val route: String) {
     }
 
     // Coach
-    object CoachHome : Screen("coach_home")
+    object CoachHome : Screen("coach_home?email={email}") {
+        fun createRoute(email: String) = "coach_home?email=$email"
+    }
     object CoachApplication : Screen("coach_application")
-    object CoachProfile : Screen("coach_profile")
+    object CoachProfile : Screen("coach_profile?email={email}") {
+        fun createRoute(email: String) = "coach_profile?email=$email"
+    }
     object EditCoachProfile : Screen("edit_coach_profile")
     object CoachSessions : Screen("coach_sessions")
     object CoachSessionDetail : Screen("coach_session_detail/{sessionId}") {
@@ -50,7 +58,9 @@ sealed class Screen(val route: String) {
     object Reviews : Screen("reviews")
 
     // Admin
-    object AdminHome : Screen("admin_home")
+    object AdminHome : Screen("admin_home?email={email}") {
+        fun createRoute(email: String) = "admin_home?email=$email"
+    }
     object PendingCoaches : Screen("pending_coaches")
     object CoachDetailAdmin : Screen("coach_detail_admin/{coachId}") {
         fun createRoute(coachId: String) = "coach_detail_admin/$coachId"

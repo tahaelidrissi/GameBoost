@@ -23,12 +23,13 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachProfileScreen(navController: NavController) {
-    val coach = remember {
+fun CoachProfileScreen(navController: NavController, email: String = "coach@test.com") {
+    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    val coach = remember(email) {
         Coach(
             id = "1",
-            username = "coach_valorant",
-            email = "coach@test.com",
+            username = username,
+            email = email,
             game = "Valorant",
             rank = "Radiant",
             bio = "Coach professionnel avec 5 ans d'expérience",
@@ -46,6 +47,11 @@ fun CoachProfileScreen(navController: NavController) {
             GameCoachTopBar(
                 title = "Mon Profil",
                 onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.CoachHome.createRoute(email)) {
+                        popUpTo(Screen.CoachHome.route) { inclusive = true }
+                    }
+                },
                 actions = {
                     IconButton(onClick = { navController.navigate(Screen.EditCoachProfile.route) }) {
                         Icon(Icons.Default.Edit, contentDescription = "Modifier")
@@ -79,7 +85,7 @@ fun CoachProfileScreen(navController: NavController) {
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                "C",
+                                username.take(1).uppercase(),
                                 fontSize = 42.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PrimaryBlue
@@ -167,27 +173,20 @@ fun CoachProfileScreen(navController: NavController) {
                 }
             }
 
-            // Note d'information
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF0F9FF)
-                )
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Button(
+                onClick = { 
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = PrimaryBlue
-                    )
-                    Text(
-                        "Les fonctionnalités d'édition de profil seront bientôt disponibles.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
-                    )
-                }
+                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Retour au Menu Principal")
             }
         }
     }

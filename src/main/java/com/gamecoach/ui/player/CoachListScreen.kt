@@ -27,7 +27,7 @@ import com.gamecoach.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachListScreen(navController: NavController) {
+fun CoachListScreen(navController: NavController, email: String = "joueur@test.com") {
     var searchQuery by remember { mutableStateOf("") }
     var selectedGame by remember { mutableStateOf<String?>(null) }
     var showFilterDialog by remember { mutableStateOf(false) }
@@ -88,7 +88,12 @@ fun CoachListScreen(navController: NavController) {
         topBar = {
             GameCoachTopBar(
                 title = "Trouver un Coach",
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.PlayerHome.createRoute(email)) {
+                        popUpTo(Screen.PlayerHome.route) { inclusive = true }
+                    }
+                }
             )
         }
     ) { padding ->

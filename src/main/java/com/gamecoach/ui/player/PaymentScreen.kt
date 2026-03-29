@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
+import com.gamecoach.ui.navigation.Screen
 import com.gamecoach.ui.theme.*
 import kotlinx.coroutines.delay
 
@@ -26,7 +27,6 @@ import kotlinx.coroutines.delay
 fun PaymentScreen(navController: NavController) {
     var isProcessing by remember { mutableStateOf(false) }
     var isPaid by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -34,7 +34,9 @@ fun PaymentScreen(navController: NavController) {
                 title = if (isPaid) "Paiement Réussi" else "Paiement",
                 onBackClick = { 
                     if (isPaid) {
-                        navController.popBackStack()
+                        navController.navigate(Screen.PlayerHome.route) {
+                            popUpTo(Screen.PlayerHome.route) { inclusive = true }
+                        }
                     } else {
                         navController.navigateUp()
                     }
@@ -135,18 +137,10 @@ fun PaymentScreen(navController: NavController) {
                         text = "Simuler le paiement",
                         onClick = {
                             isProcessing = true
-                            // Simulation d'un délai de traitement
-                            scope.run {
-                                // On utilise SideEffect ou LaunchedEffect mais ici un simple clic suffit
-                                // On va simuler le délai directement dans le onClick pour l'exemple
-                            }
-                            // Pour simuler proprement dans Compose sans bloquer le thread UI
-                            // Normalement on utiliserait un ViewModel
                         },
                         isLoading = isProcessing
                     )
 
-                    // Petit hack pour la simulation car on n'a pas accès au ViewModel ici
                     LaunchedEffect(isProcessing) {
                         if (isProcessing) {
                             delay(2000)
@@ -201,9 +195,11 @@ fun PaymentScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(48.dp))
 
                     GameCoachButton(
-                        text = "Retour à mes sessions",
+                        text = "Retour à l'accueil",
                         onClick = {
-                            navController.popBackStack()
+                            navController.navigate(Screen.PlayerHome.route) {
+                                popUpTo(Screen.PlayerHome.route) { inclusive = true }
+                            }
                         }
                     )
                 }

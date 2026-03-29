@@ -23,13 +23,20 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
-    val user = remember {
+fun ProfileScreen(navController: NavController, email: String = "joueur@test.com") {
+    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    val role = when {
+        email.contains("admin", ignoreCase = true) -> UserRole.ADMIN
+        email.contains("coach", ignoreCase = true) -> UserRole.COACH
+        else -> UserRole.PLAYER
+    }
+
+    val user = remember(email) {
         User(
             id = "1",
-            username = "Abderrafia",
-            email = "admin12@test.com",
-            role = UserRole.PLAYER,
+            username = username,
+            email = email,
+            role = role,
             createdAt = "5 mars 2026"
         )
     }
@@ -72,7 +79,7 @@ fun ProfileScreen(navController: NavController) {
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                "A",
+                                username.take(1).uppercase(),
                                 fontSize = 42.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PrimaryBlue
@@ -141,27 +148,18 @@ fun ProfileScreen(navController: NavController) {
                 }
             }
 
-            // Note
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF0F9FF)
-                )
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Button(
+                onClick = { navController.navigate(Screen.Login.route) {
+                    popUpTo(0)
+                } },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = PrimaryBlue
-                    )
-                    Text(
-                        "Les fonctionnalités d'édition de profil seront bientôt disponibles.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
-                    )
-                }
+                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Retour au Menu Principal")
             }
         }
     }

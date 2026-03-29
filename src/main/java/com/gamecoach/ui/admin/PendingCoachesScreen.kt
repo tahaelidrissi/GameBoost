@@ -26,7 +26,7 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PendingCoachesScreen(navController: NavController) {
+fun PendingCoachesScreen(navController: NavController, email: String = "admin@test.com") {
     val pendingCoaches = remember {
         listOf<Coach>() // Liste vide pour l'instant
     }
@@ -35,7 +35,12 @@ fun PendingCoachesScreen(navController: NavController) {
         topBar = {
             GameCoachTopBar(
                 title = "Candidatures en attente",
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.AdminHome.createRoute(email)) {
+                        popUpTo(Screen.AdminHome.route) { inclusive = true }
+                    }
+                }
             )
         }
     ) { padding ->

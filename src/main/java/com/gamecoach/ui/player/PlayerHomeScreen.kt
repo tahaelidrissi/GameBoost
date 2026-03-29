@@ -1,7 +1,9 @@
 package com.gamecoach.ui.player
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,13 +22,15 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerHomeScreen(navController: NavController) {
+fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.com") {
+    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
     Scaffold(
         topBar = {
             GameCoachTopBar(
-                title = "GameCoach",
+                title = "GameBoost",
                 actions = {
-                    IconButton(onClick = { navController.navigate(Screen.Profile.route) }) {
+                    IconButton(onClick = { navController.navigate(Screen.Profile.createRoute(email)) }) {
                         Icon(Icons.Default.Person, contentDescription = "Profil")
                     }
                 }
@@ -60,7 +64,7 @@ fun PlayerHomeScreen(navController: NavController) {
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.Profile.route) },
+                    onClick = { navController.navigate(Screen.Profile.createRoute(email)) },
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profil") },
                     label = { Text("Profil") }
                 )
@@ -71,6 +75,7 @@ fun PlayerHomeScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -87,7 +92,7 @@ fun PlayerHomeScreen(navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Bienvenue, Abderrafia !",
+                        text = "Bienvenue, $username !",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -135,12 +140,6 @@ fun PlayerHomeScreen(navController: NavController) {
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
                         )
-                        Text(
-                            text = "Parcourez les meilleurs coachs",
-                            fontSize = 12.sp,
-                            color = TextSecondary,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
                     }
                 }
 
@@ -167,12 +166,6 @@ fun PlayerHomeScreen(navController: NavController) {
                             text = "Mes Sessions",
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
-                        )
-                        Text(
-                            text = "Voir mes sessions programmées",
-                            fontSize = 12.sp,
-                            color = TextSecondary,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
                 }
@@ -206,37 +199,18 @@ fun PlayerHomeScreen(navController: NavController) {
                 )
             }
 
-            // Conseil du jour
-            Card(
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Button(
+                onClick = { navController.navigate(Screen.Login.route) {
+                    popUpTo(0)
+                } },
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF0F9FF)
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Lightbulb,
-                        contentDescription = null,
-                        tint = Warning,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "💡 Conseil du jour",
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryBlue
-                        )
-                        Text(
-                            text = "Avant votre session, préparez des replays de vos parties pour maximiser le temps avec votre coach.",
-                            fontSize = 14.sp,
-                            color = TextSecondary
-                        )
-                    }
-                }
+                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Retour au Menu Principal")
             }
         }
     }

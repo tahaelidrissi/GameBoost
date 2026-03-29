@@ -1,7 +1,9 @@
 package com.gamecoach.ui.coach
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,13 +22,15 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachHomeScreen(navController: NavController) {
+fun CoachHomeScreen(navController: NavController, email: String = "coach@test.com") {
+    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
     Scaffold(
         topBar = {
             GameCoachTopBar(
-                title = "GameCoach",
+                title = "GameBoost",
                 actions = {
-                    IconButton(onClick = { navController.navigate(Screen.CoachProfile.route) }) {
+                    IconButton(onClick = { navController.navigate(Screen.CoachProfile.createRoute(email)) }) {
                         Icon(Icons.Default.Person, contentDescription = "Profil")
                     }
                 }
@@ -60,7 +64,7 @@ fun CoachHomeScreen(navController: NavController) {
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachProfile.route) },
+                    onClick = { navController.navigate(Screen.CoachProfile.createRoute(email)) },
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profil") },
                     label = { Text("Profil") }
                 )
@@ -71,6 +75,7 @@ fun CoachHomeScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -84,7 +89,7 @@ fun CoachHomeScreen(navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        "Bonjour, Coach ! 👋",
+                        "Bonjour, $username ! 👋",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -120,26 +125,6 @@ fun CoachHomeScreen(navController: NavController) {
                 )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    icon = Icons.Default.Star,
-                    value = "5.0",
-                    label = "Note moyenne",
-                    modifier = Modifier.weight(1f),
-                    iconTint = Warning
-                )
-                StatCard(
-                    icon = Icons.Default.Timer,
-                    value = "0",
-                    label = "En attente",
-                    modifier = Modifier.weight(1f),
-                    iconTint = Warning
-                )
-            }
-
             // Actions rapides
             Text("Actions rapides", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
@@ -165,26 +150,18 @@ fun CoachHomeScreen(navController: NavController) {
                 }
             }
 
-            Card(
-                onClick = { navController.navigate(Screen.Revenue.route) },
-                modifier = Modifier.fillMaxWidth()
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Button(
+                onClick = { navController.navigate(Screen.Login.route) {
+                    popUpTo(0)
+                } },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.TrendingUp,
-                        contentDescription = null,
-                        tint = Success,
-                        modifier = Modifier.size(40.dp)
-                    )
-                    Column {
-                        Text("Mes revenus", fontWeight = FontWeight.Bold)
-                        Text("Consulter l'historique des gains", fontSize = 14.sp, color = TextSecondary)
-                    }
-                }
+                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Retour au Menu Principal")
             }
         }
     }

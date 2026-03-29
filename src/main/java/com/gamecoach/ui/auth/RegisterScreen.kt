@@ -17,12 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
+import com.gamecoach.model.User
 import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTextField
 import com.gamecoach.ui.navigation.Screen
 import com.gamecoach.ui.theme.PrimaryBlue
 import com.gamecoach.ui.theme.PrimaryPurple
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +35,7 @@ fun RegisterScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var selectedRole by remember { mutableStateOf(UserRole.PLAYER) }
     var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -51,10 +55,9 @@ fun RegisterScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Logo et titre
             Icon(
                 imageVector = Icons.Default.SportsEsports,
-                contentDescription = "GameCoach",
+                contentDescription = "GameBoost",
                 modifier = Modifier.size(80.dp),
                 tint = Color.White
             )
@@ -69,14 +72,13 @@ fun RegisterScreen(navController: NavController) {
             )
 
             Text(
-                text = "Rejoignez GameCoach",
+                text = "Rejoignez GameBoost",
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Card d'inscription
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -89,33 +91,41 @@ fun RegisterScreen(navController: NavController) {
                 ) {
                     GameCoachTextField(
                         value = username,
-                        onValueChange = { username = it },
+                        onValueChange = { 
+                            username = it
+                            if (errorMessage.isNotEmpty()) errorMessage = ""
+                        },
                         label = "Nom d'utilisateur",
                         leadingIcon = Icons.Default.Person
                     )
 
                     GameCoachTextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = { 
+                            email = it
+                            if (errorMessage.isNotEmpty()) errorMessage = ""
+                        },
                         label = "Email",
                         leadingIcon = Icons.Default.Email
                     )
 
                     GameCoachTextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = { 
+                            password = it
+                            if (errorMessage.isNotEmpty()) errorMessage = ""
+                        },
                         label = "Mot de passe",
                         leadingIcon = Icons.Default.Lock,
                         isPassword = true
                     )
 
                     Text(
-                        text = "Min. 8 caractères, 1 majuscule, 1 chiffre",
+                        text = "Min. 8 caractères",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
-                    // Sélection du rôle
                     Text(
                         text = "Je suis un",
                         style = MaterialTheme.typography.titleMedium,
@@ -126,44 +136,26 @@ fun RegisterScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Bouton Joueur
                         FilterChip(
                             selected = selectedRole == UserRole.PLAYER,
                             onClick = { selectedRole = UserRole.PLAYER },
-                            label = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Person,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text("Joueur")
-                                }
-                            },
+                            label = { Text("Joueur") },
                             modifier = Modifier.weight(1f)
                         )
 
-                        // Bouton Coach
                         FilterChip(
                             selected = selectedRole == UserRole.COACH,
                             onClick = { selectedRole = UserRole.COACH },
-                            label = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.School,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text("Coach")
-                                }
-                            },
+                            label = { Text("Coach") },
                             modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
 
@@ -172,11 +164,24 @@ fun RegisterScreen(navController: NavController) {
                     GameCoachButton(
                         text = "Créer mon compte",
                         onClick = {
-                            // TODO: Appel API d'inscription
-                            isLoading = true
-                            // Simulation
-                            navController.navigate(Screen.Login.route) {
-                                popUpTo(Screen.Register.route) { inclusive = true }
+                            if (username.isBlank() || email.isBlank() || password.isBlank()) {
+                                errorMessage = "Veuillez remplir tous les champs"
+                            } else if (password.length < 8) {
+                                errorMessage = "Le mot de passe doit contenir au moins 8 caractères"
+                            } else {
+                                isLoading = true
+                                // Simulation BACKEND : Inscription réelle dans le MockRepository
+                                MockRepository.registerUser(
+                                    User(
+                                        id = UUID.randomUUID().toString(),
+                                        username = username,
+                                        email = email,
+                                        role = selectedRole
+                                    )
+                                )
+                                navController.navigate(Screen.Login.route) {
+                                    popUpTo(Screen.Register.route) { inclusive = true }
+                                }
                             }
                         },
                         isLoading = isLoading
@@ -202,7 +207,6 @@ fun RegisterScreen(navController: NavController) {
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }

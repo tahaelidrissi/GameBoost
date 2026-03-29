@@ -22,12 +22,12 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerSessionsScreen(navController: NavController) {
+fun PlayerSessionsScreen(navController: NavController, email: String = "joueur@test.com") {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Toutes", "En attente", "Acceptées", "Terminées")
 
     // Données simulées
-    val sessions = remember {
+    val allSessions = remember {
         listOf(
             Session(
                 id = "1",
@@ -53,11 +53,26 @@ fun PlayerSessionsScreen(navController: NavController) {
         )
     }
 
+    val filteredSessions = remember(selectedTab) {
+        when (selectedTab) {
+            0 -> allSessions
+            1 -> allSessions.filter { it.status == SessionStatus.PENDING }
+            2 -> allSessions.filter { it.status == SessionStatus.ACCEPTED || it.status == SessionStatus.IN_PROGRESS }
+            3 -> allSessions.filter { it.status == SessionStatus.COMPLETED }
+            else -> allSessions
+        }
+    }
+
     Scaffold(
         topBar = {
             GameCoachTopBar(
                 title = "Mes Sessions",
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.PlayerHome.createRoute(email)) {
+                        popUpTo(Screen.PlayerHome.route) { inclusive = true }
+                    }
+                }
             )
         }
     ) { padding ->
@@ -77,10 +92,10 @@ fun PlayerSessionsScreen(navController: NavController) {
                 }
             }
 
-            if (sessions.isEmpty()) {
+            if (filteredSessions.isEmpty()) {
                 EmptyState(
                     icon = Icons.Default.CalendarToday,
-                    message = "Aucune session"
+                    message = "Aucune session dans cette catégorie"
                 )
             } else {
                 LazyColumn(
@@ -88,7 +103,7 @@ fun PlayerSessionsScreen(navController: NavController) {
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(sessions) { session ->
+                    items(filteredSessions) { session ->
                         SessionCard(
                             session = session,
                             onClick = {
@@ -116,7 +131,8 @@ fun SessionCard(session: Session, onClick: () -> Unit) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = session.game,
                     style = MaterialTheme.typography.titleMedium,

@@ -19,11 +19,12 @@ import androidx.navigation.NavController
 import com.gamecoach.model.User
 import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.GameCoachTopBar
+import com.gamecoach.ui.navigation.Screen
 import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageUsersScreen(navController: NavController) {
+fun ManageUsersScreen(navController: NavController, email: String = "admin@test.com") {
     var selectedFilter by remember { mutableStateOf<UserRole?>(null) }
     var searchQuery by remember { mutableStateOf("") }
 
@@ -70,7 +71,12 @@ fun ManageUsersScreen(navController: NavController) {
         topBar = {
             GameCoachTopBar(
                 title = "Utilisateurs",
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.AdminHome.createRoute(email)) {
+                        popUpTo(Screen.AdminHome.route) { inclusive = true }
+                    }
+                }
             )
         }
     ) { padding ->

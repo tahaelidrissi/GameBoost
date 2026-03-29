@@ -21,13 +21,15 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdminHomeScreen(navController: NavController) {
+fun AdminHomeScreen(navController: NavController, email: String = "admin@test.com") {
+    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
     Scaffold(
         topBar = {
             GameCoachTopBar(
                 title = "Dashboard Admin",
                 actions = {
-                    IconButton(onClick = { navController.navigate(Screen.Profile.route) }) {
+                    IconButton(onClick = { navController.navigate(Screen.Profile.createRoute(email)) }) {
                         Icon(Icons.Default.Person, contentDescription = "Profil")
                     }
                 }
@@ -74,7 +76,7 @@ fun AdminHomeScreen(navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        "Dashboard Admin",
+                        "Bonjour, $username !",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -109,26 +111,6 @@ fun AdminHomeScreen(navController: NavController) {
                 )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    icon = Icons.Default.CalendarToday,
-                    value = "1",
-                    label = "Sessions terminées",
-                    modifier = Modifier.weight(1f),
-                    iconTint = Warning
-                )
-                StatCard(
-                    icon = Icons.Default.AttachMoney,
-                    value = "70€",
-                    label = "Revenus totaux",
-                    modifier = Modifier.weight(1f),
-                    iconTint = Success
-                )
-            }
-
             // Actions rapides
             Text("Actions rapides", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
@@ -154,26 +136,20 @@ fun AdminHomeScreen(navController: NavController) {
                 }
             }
 
-            Card(
-                onClick = { navController.navigate(Screen.ManageUsers.route) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.People,
-                        contentDescription = null,
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(40.dp)
-                    )
-                    Column {
-                        Text("Gérer les utilisateurs", fontWeight = FontWeight.Bold)
-                        Text("Voir tous les utilisateurs", fontSize = 14.sp, color = TextSecondary)
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Button(
+                onClick = { 
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0)
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ) {
+                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Retour au Menu Principal")
             }
         }
     }

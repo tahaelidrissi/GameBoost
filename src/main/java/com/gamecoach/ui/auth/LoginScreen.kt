@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTextField
 import com.gamecoach.ui.navigation.Screen
@@ -51,7 +52,7 @@ fun LoginScreen(navController: NavController) {
             // Logo et titre
             Icon(
                 imageVector = Icons.Default.SportsEsports,
-                contentDescription = "GameCoach",
+                contentDescription = "GameBoost",
                 modifier = Modifier.size(80.dp),
                 tint = Color.White
             )
@@ -59,7 +60,7 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "GameCoach",
+                text = "GameBoost",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -124,10 +125,20 @@ fun LoginScreen(navController: NavController) {
                         onClick = {
                             if (email.isBlank() || password.isBlank()) {
                                 errorMessage = "Veuillez remplir tous les champs"
+                            } else if (!MockRepository.isUserRegistered(email)) {
+                                // VÉRIFICATION BACKEND SIMULÉE
+                                errorMessage = "Utilisateur non inscrit. Veuillez créer un compte."
                             } else {
                                 isLoading = true
-                                // Simulation - Navigation vers PlayerHome
-                                navController.navigate(Screen.PlayerHome.route) {
+                                
+                                // Redirection basée sur l'email pour la phase de test
+                                val targetRoute = when {
+                                    email.contains("admin", ignoreCase = true) -> Screen.AdminHome.createRoute(email)
+                                    email.contains("coach", ignoreCase = true) -> Screen.CoachHome.createRoute(email)
+                                    else -> Screen.PlayerHome.createRoute(email)
+                                }
+
+                                navController.navigate(targetRoute) {
                                     popUpTo(Screen.Login.route) { inclusive = true }
                                 }
                             }
@@ -175,7 +186,7 @@ fun LoginScreen(navController: NavController) {
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "Joueur: joueur1@test.com / Player123",
+                        text = "Joueur: joueur@test.com / Player123",
                         fontSize = 12.sp
                     )
                     Text(

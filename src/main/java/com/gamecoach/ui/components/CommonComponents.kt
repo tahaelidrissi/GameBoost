@@ -23,9 +23,10 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameCoachTopBar(
+fun GameBoostTopBar(
     title: String,
     onBackClick: (() -> Unit)? = null,
+    onHomeClick: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
@@ -46,7 +47,17 @@ fun GameCoachTopBar(
                 }
             }
         },
-        actions = actions,
+        actions = {
+            if (onHomeClick != null) {
+                IconButton(onClick = onHomeClick) {
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Home"
+                    )
+                }
+            }
+            actions()
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = PrimaryBlue,
             titleContentColor = Color.White,
@@ -54,6 +65,17 @@ fun GameCoachTopBar(
             actionIconContentColor = Color.White
         )
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GameCoachTopBar(
+    title: String,
+    onBackClick: (() -> Unit)? = null,
+    onHomeClick: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {}
+) {
+    GameBoostTopBar(title, onBackClick, onHomeClick, actions)
 }
 
 @Composable
@@ -175,7 +197,7 @@ fun ErrorScreen(
             if (onRetry != null) {
                 GameCoachButton(
                     text = "Réessayer",
-                    onClick = onRetry,
+                    onClick = { onRetry() },
                     modifier = Modifier.width(200.dp)
                 )
             }
@@ -289,7 +311,7 @@ fun InfoRow(
 @Composable
 fun SessionStatusBadge(status: SessionStatus) {
     val (color, text) = when (status) {
-        SessionStatus.PENDING -> Warning to "En attente"
+        SessionStatus.PENDING -> Warning to "En attente de confirmation du coach"
         SessionStatus.ACCEPTED -> Success to "Acceptée"
         SessionStatus.REJECTED -> Error to "Refusée"
         SessionStatus.IN_PROGRESS -> PrimaryBlue to "En cours"

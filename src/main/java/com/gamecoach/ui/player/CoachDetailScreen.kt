@@ -27,7 +27,7 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachDetailScreen(navController: NavController) {
+fun CoachDetailScreen(navController: NavController, email: String = "joueur@test.com") {
     // Simulation - récupérer le coach par ID
     val coach = remember {
         Coach(
@@ -74,7 +74,12 @@ fun CoachDetailScreen(navController: NavController) {
         topBar = {
             GameCoachTopBar(
                 title = "Profil du Coach",
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.PlayerHome.createRoute(email)) {
+                        popUpTo(Screen.PlayerHome.route) { inclusive = true }
+                    }
+                }
             )
         },
         bottomBar = {
@@ -115,7 +120,9 @@ fun CoachDetailScreen(navController: NavController) {
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
