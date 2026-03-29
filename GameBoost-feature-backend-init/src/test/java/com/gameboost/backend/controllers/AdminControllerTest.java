@@ -29,12 +29,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AdminController — Tests unitaires")
 class AdminControllerTest {
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @MockitoBean private AdminService adminService;
-    @MockitoBean private JwtUtils jwtUtils;
-    @MockitoBean private JwtAuthFilter jwtAuthFilter;
-    @MockitoBean private UserDetailsServiceImpl userDetailsService;
+    @MockitoBean
+    private AdminService adminService;
+    @MockitoBean
+    private JwtUtils jwtUtils;
+    @MockitoBean
+    private JwtAuthFilter jwtAuthFilter;
+    @MockitoBean
+    private UserDetailsServiceImpl userDetailsService;
 
     @Nested
     @DisplayName("GET /admin/coaches/pending")
