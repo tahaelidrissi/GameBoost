@@ -96,7 +96,7 @@ fun CoachDetailScreen(navController: NavController, email: String = "joueur@test
                     GameCoachButton(
                         text = "Demander une session",
                         onClick = {
-                            navController.navigate(Screen.RequestSession.createRoute(coach.id))
+                            navController.navigate(Screen.RequestSession.createRoute(coach.id, email))
                         },
                         modifier = Modifier.weight(1f)
                     )

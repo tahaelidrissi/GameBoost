@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.Session
 import com.gamecoach.model.SessionStatus
 import com.gamecoach.ui.components.EmptyState
@@ -22,30 +23,36 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachSessionsScreen(navController: NavController) {
+fun CoachSessionsScreen(navController: NavController, email: String = "coach@test.com") {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Toutes", "En attente", "Acceptées", "Terminées")
 
-    val sessions = remember {
-        listOf(
-            Session(
-                id = "1",
-                playerName = "joueur1",
-                game = "Valorant",
-                scheduledDate = "2024-02-28",
-                scheduledTime = "16:00",
-                duration = 2,
-                amount = 70.0,
-                status = SessionStatus.COMPLETED
-            )
-        )
+    // Récupération dynamique depuis le repository
+    val allSessions = remember(email) {
+        MockRepository.getSessionsForUser(email)
+    }
+
+    // Filtrage réel par onglet
+    val filteredSessions = remember(selectedTab, allSessions) {
+        when (selectedTab) {
+            0 -> allSessions
+            1 -> allSessions.filter { it.status == SessionStatus.PENDING }
+            2 -> allSessions.filter { it.status == SessionStatus.ACCEPTED || it.status == SessionStatus.IN_PROGRESS }
+            3 -> allSessions.filter { it.status == SessionStatus.COMPLETED }
+            else -> allSessions
+        }
     }
 
     Scaffold(
         topBar = {
             GameCoachTopBar(
                 title = "Mes Sessions",
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(Screen.CoachHome.createRoute(email)) {
+                        popUpTo(Screen.CoachHome.route) { inclusive = true }
+                    }
+                }
             )
         }
     ) { padding ->
@@ -64,10 +71,10 @@ fun CoachSessionsScreen(navController: NavController) {
                 }
             }
 
-            if (sessions.isEmpty()) {
+            if (filteredSessions.isEmpty()) {
                 EmptyState(
                     icon = Icons.Default.CalendarToday,
-                    message = "Aucune session"
+                    message = "Aucune session dans cette catégorie"
                 )
             } else {
                 LazyColumn(
@@ -75,7 +82,7 @@ fun CoachSessionsScreen(navController: NavController) {
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(sessions) { session ->
+                    items(filteredSessions) { session ->
                         SessionCard(
                             session = session,
                             onClick = {

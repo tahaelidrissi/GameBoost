@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.components.StatCard
 import com.gamecoach.ui.navigation.Screen
@@ -23,7 +25,11 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.com") {
-    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    val user = remember(email) { MockRepository.getUserByEmail(email) }
+    val username = user?.username ?: email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    
+    // Récupération dynamique des statistiques depuis le repository
+    val (sessionCount, totalHours) = remember(email) { MockRepository.getUserStats(email) }
 
     Scaffold(
         topBar = {
@@ -52,7 +58,7 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.PlayerSessions.route) },
+                    onClick = { navController.navigate(Screen.PlayerSessions.createRoute(email)) },
                     icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Sessions") },
                     label = { Text("Sessions") }
                 )
@@ -116,62 +122,38 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Bouton Trouver un Coach
                 Card(
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate(Screen.CoachList.route) },
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    )
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = PrimaryBlue,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Text(
-                            text = "Trouver un Coach",
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
+                        Icon(Icons.Default.Search, null, tint = PrimaryBlue, modifier = Modifier.size(40.dp))
+                        Text("Trouver un Coach", fontWeight = FontWeight.Bold)
                     }
                 }
 
-                // Bouton Mes Sessions
                 Card(
                     modifier = Modifier.weight(1f),
-                    onClick = { navController.navigate(Screen.PlayerSessions.route) },
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    )
+                    onClick = { navController.navigate(Screen.PlayerSessions.createRoute(email)) },
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = null,
-                            tint = Success,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Text(
-                            text = "Mes Sessions",
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
+                        Icon(Icons.Default.CalendarToday, null, tint = Success, modifier = Modifier.size(40.dp))
+                        Text("Mes Sessions", fontWeight = FontWeight.Bold)
                     }
                 }
             }
 
-            // Votre progression
+            // Progression Dynamique
             Text(
                 text = "Votre progression",
                 style = MaterialTheme.typography.titleLarge,
@@ -184,7 +166,7 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
             ) {
                 StatCard(
                     icon = Icons.Default.CalendarToday,
-                    value = "3",
+                    value = "$sessionCount",
                     label = "Sessions",
                     modifier = Modifier.weight(1f),
                     iconTint = PrimaryBlue
@@ -192,7 +174,7 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
 
                 StatCard(
                     icon = Icons.Default.Timer,
-                    value = "5h",
+                    value = "${totalHours}h",
                     label = "de coaching",
                     modifier = Modifier.weight(1f),
                     iconTint = Success
@@ -210,7 +192,7 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Retour au Menu Principal")
+                Text("Se déconnecter")
             }
         }
     }

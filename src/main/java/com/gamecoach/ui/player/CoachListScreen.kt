@@ -167,7 +167,7 @@ fun CoachListScreen(navController: NavController, email: String = "joueur@test.c
                     CoachCard(
                         coach = coach,
                         onClick = {
-                            navController.navigate(Screen.CoachDetail.createRoute(coach.id))
+                            navController.navigate(Screen.CoachDetail.createRoute(coach.id, email))
                         }
                     )
                 }

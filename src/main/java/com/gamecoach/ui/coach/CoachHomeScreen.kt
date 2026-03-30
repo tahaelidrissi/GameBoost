@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.components.StatCard
 import com.gamecoach.ui.navigation.Screen
@@ -23,7 +25,12 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachHomeScreen(navController: NavController, email: String = "coach@test.com") {
-    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    // FIX: Utilisation du MockRepository pour le nom et les stats
+    val user = remember(email) { MockRepository.getUserByEmail(email) }
+    val username = user?.username ?: email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    
+    val (sessionCount, totalHours) = remember(email) { MockRepository.getUserStats(email) }
+    val revenue = sessionCount * 35 // Simulation simple de revenu
 
     Scaffold(
         topBar = {
@@ -46,7 +53,7 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachSessions.route) },
+                    onClick = { navController.navigate(Screen.CoachSessions.createRoute(email)) },
                     icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Sessions") },
                     label = { Text("Sessions") }
                 )
@@ -102,7 +109,7 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                 }
             }
 
-            // Stats
+            // Stats DYNAMIQUES
             Text("Vos statistiques", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Row(
@@ -111,14 +118,14 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
             ) {
                 StatCard(
                     icon = Icons.Default.CalendarToday,
-                    value = "2",
+                    value = "$sessionCount",
                     label = "Sessions totales",
                     modifier = Modifier.weight(1f),
                     iconTint = PrimaryBlue
                 )
                 StatCard(
                     icon = Icons.Default.AttachMoney,
-                    value = "70€",
+                    value = "${revenue}€",
                     label = "Revenus",
                     modifier = Modifier.weight(1f),
                     iconTint = Success
@@ -129,7 +136,7 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
             Text("Actions rapides", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Card(
-                onClick = { navController.navigate(Screen.CoachSessions.route) },
+                onClick = { navController.navigate(Screen.CoachSessions.createRoute(email)) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -161,7 +168,7 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Retour au Menu Principal")
+                Text("Se déconnecter")
             }
         }
     }

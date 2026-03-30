@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
+import com.gamecoach.model.Session
+import com.gamecoach.model.SessionStatus
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.navigation.Screen
@@ -21,7 +24,10 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RequestSessionScreen(navController: NavController, email: String = "joueur@test.com") {
+fun RequestSessionScreen(navController: NavController, coachId: String = "1", email: String = "") {
+    val coach = remember(coachId) { MockRepository.getCoachById(coachId) }
+    val user = remember(email) { MockRepository.getUserByEmail(email) }
+    
     var selectedDuration by remember { mutableStateOf(1) }
     var selectedDate by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
@@ -32,7 +38,8 @@ fun RequestSessionScreen(navController: NavController, email: String = "joueur@t
     val datePickerState = rememberDatePickerState()
     val timePickerState = rememberTimePickerState()
 
-    val totalAmount = 35.0 * selectedDuration
+    val hourlyRate = coach?.hourlyRate ?: 35.0
+    val totalAmount = hourlyRate * selectedDuration
 
     Scaffold(
         topBar = {
@@ -55,6 +62,16 @@ fun RequestSessionScreen(navController: NavController, email: String = "joueur@t
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Coach Info Summary
+            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = PrimaryBlue.copy(alpha = 0.1f))) {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Column {
+                        Text("Coach: ${coach?.username ?: "Expert"}", fontWeight = FontWeight.Bold)
+                        Text("Jeu: ${coach?.game ?: "Multijeux"}", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+
             // Durée
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -152,8 +169,27 @@ fun RequestSessionScreen(navController: NavController, email: String = "joueur@t
                     }
                     GameCoachButton(
                         text = "Confirmer la demande",
+                        enabled = selectedDate.isNotEmpty() && selectedTime.isNotEmpty(),
                         onClick = {
-                            navController.navigate(Screen.PlayerSessions.route)
+                            // FRONTEND RESPONSIBILITY: Créer l'objet session et l'envoyer au "backend"
+                            val newSession = Session(
+                                id = UUID.randomUUID().toString(),
+                                playerId = user?.id ?: "0",
+                                playerName = user?.username ?: "Joueur Anonyme",
+                                coachId = coachId,
+                                coachName = coach?.username ?: "Expert",
+                                game = coach?.game ?: "Multijeux",
+                                duration = selectedDuration,
+                                scheduledDate = selectedDate,
+                                scheduledTime = selectedTime,
+                                amount = totalAmount,
+                                status = SessionStatus.PENDING,
+                                isPaid = false
+                            )
+                            MockRepository.addSession(newSession)
+                            navController.navigate(Screen.PlayerSessions.createRoute(email)) {
+                                popUpTo(Screen.PlayerHome.route)
+                            }
                         }
                     )
                 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.User
 import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.GameCoachTopBar
@@ -24,20 +25,14 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, email: String = "joueur@test.com") {
-    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
-    val role = when {
-        email.contains("admin", ignoreCase = true) -> UserRole.ADMIN
-        email.contains("coach", ignoreCase = true) -> UserRole.COACH
-        else -> UserRole.PLAYER
-    }
-
+    // Récupération dynamique depuis le repository
     val user = remember(email) {
-        User(
-            id = "1",
-            username = username,
+        MockRepository.getUserByEmail(email) ?: User(
+            id = "0",
+            username = email.substringBefore("@"),
             email = email,
-            role = role,
-            createdAt = "5 mars 2026"
+            role = UserRole.PLAYER,
+            createdAt = "Inconnu"
         )
     }
 
@@ -46,6 +41,16 @@ fun ProfileScreen(navController: NavController, email: String = "joueur@test.com
             GameCoachTopBar(
                 title = "Mon Profil",
                 onBackClick = { navController.navigateUp() },
+                onHomeClick = {
+                    val route = when (user.role) {
+                        UserRole.ADMIN -> Screen.AdminHome.createRoute(email)
+                        UserRole.COACH -> Screen.CoachHome.createRoute(email)
+                        UserRole.PLAYER -> Screen.PlayerHome.createRoute(email)
+                    }
+                    navController.navigate(route) {
+                        popUpTo(route) { inclusive = true }
+                    }
+                },
                 actions = {
                     IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
                         Icon(Icons.Default.Settings, contentDescription = "Paramètres")
@@ -79,7 +84,7 @@ fun ProfileScreen(navController: NavController, email: String = "joueur@test.com
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                username.take(1).uppercase(),
+                                user.username.take(1).uppercase(),
                                 fontSize = 42.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PrimaryBlue
@@ -133,9 +138,9 @@ fun ProfileScreen(navController: NavController, email: String = "joueur@test.com
                 }
             }
 
-            // Actions
+            // Action Modifier (FIX: Activation du bouton)
             Card(
-                onClick = { /* TODO */ },
+                onClick = { navController.navigate(Screen.EditProfile.createRoute(email)) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(

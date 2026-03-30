@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.Session
 import com.gamecoach.model.SessionStatus
 import com.gamecoach.ui.components.EmptyState
@@ -26,34 +28,13 @@ fun PlayerSessionsScreen(navController: NavController, email: String = "joueur@t
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Toutes", "En attente", "Acceptées", "Terminées")
 
-    // Données simulées
-    val allSessions = remember {
-        listOf(
-            Session(
-                id = "1",
-                coachName = "ProValorant",
-                game = "Valorant",
-                scheduledDate = "2024-03-10",
-                scheduledTime = "16:00",
-                duration = 1,
-                amount = 35.0,
-                status = SessionStatus.ACCEPTED
-            ),
-            Session(
-                id = "2",
-                coachName = "LeagueGuru",
-                game = "League of Legends",
-                scheduledDate = "2024-03-08",
-                scheduledTime = "14:00",
-                duration = 2,
-                amount = 80.0,
-                status = SessionStatus.COMPLETED,
-                isPaid = true
-            )
-        )
+    // Récupération dynamique depuis le repository (VRAI FIX)
+    val allSessions = remember(email) {
+        MockRepository.getSessionsForUser(email)
     }
 
-    val filteredSessions = remember(selectedTab) {
+    // Filtrage réel basé sur l'onglet
+    val filteredSessions = remember(selectedTab, allSessions) {
         when (selectedTab) {
             0 -> allSessions
             1 -> allSessions.filter { it.status == SessionStatus.PENDING }
@@ -81,8 +62,7 @@ fun PlayerSessionsScreen(navController: NavController, email: String = "joueur@t
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Tabs
-            ScrollableTabRow(selectedTabIndex = selectedTab) {
+            TabRow(selectedTabIndex = selectedTab) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
@@ -107,7 +87,7 @@ fun PlayerSessionsScreen(navController: NavController, email: String = "joueur@t
                         SessionCard(
                             session = session,
                             onClick = {
-                                navController.navigate(Screen.SessionDetail.createRoute(session.id))
+                                navController.navigate(Screen.SessionDetail.createRoute(session.id, email))
                             }
                         )
                     }
@@ -122,7 +102,9 @@ fun PlayerSessionsScreen(navController: NavController, email: String = "joueur@t
 fun SessionCard(session: Session, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -141,51 +123,24 @@ fun SessionCard(session: Session, onClick: () -> Unit) {
                 SessionStatusBadge(session.status)
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = TextSecondary
-                )
-                Text(
-                    text = session.coachName,
-                    color = TextSecondary
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Person, null, modifier = Modifier.size(16.dp), tint = TextSecondary)
+                Spacer(Modifier.width(4.dp))
+                Text(text = session.coachName, color = TextSecondary)
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Default.CalendarToday,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = TextSecondary
-                )
-                Text(
-                    text = "${session.scheduledDate} • ${session.scheduledTime}",
-                    color = TextSecondary
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CalendarToday, null, modifier = Modifier.size(16.dp), tint = TextSecondary)
+                Spacer(Modifier.width(4.dp))
+                Text(text = "${session.scheduledDate} • ${session.scheduledTime}", color = TextSecondary)
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "${session.duration}h",
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "${session.amount}€",
-                    fontWeight = FontWeight.Bold,
-                    color = Success
-                )
+                Text(text = "${session.duration}h", fontWeight = FontWeight.Bold)
+                Text(text = "${session.amount}€", fontWeight = FontWeight.Bold, color = Success)
             }
         }
     }
