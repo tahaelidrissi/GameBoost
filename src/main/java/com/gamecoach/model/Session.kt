@@ -17,10 +17,11 @@ data class Session(
 )
 
 enum class SessionStatus {
-    PENDING,
-    ACCEPTED,
+    PENDING,            // Joueur a demandé, Coach doit valider
+    AWAITING_PAYMENT,   // Coach a validé, Joueur doit payer
+    ACCEPTED,           // Payé, prête à être effectuée
+    IN_PROGRESS,        // En cours
+    COMPLETED,          // Terminée par le coach
     REJECTED,
-    IN_PROGRESS,
-    COMPLETED,
     CANCELLED
 }

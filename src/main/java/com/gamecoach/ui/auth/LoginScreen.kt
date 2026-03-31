@@ -49,7 +49,6 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo et titre
             Icon(
                 imageVector = Icons.Default.SportsEsports,
                 contentDescription = "GameBoost",
@@ -77,9 +76,7 @@ fun LoginScreen(navController: NavController) {
             // Card de connexion
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                )
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -102,9 +99,7 @@ fun LoginScreen(navController: NavController) {
                             if (errorMessage.isNotEmpty()) errorMessage = ""
                         },
                         label = { Text("Mot de passe") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Lock, contentDescription = null)
-                        },
+                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -126,18 +121,18 @@ fun LoginScreen(navController: NavController) {
                             if (email.isBlank() || password.isBlank()) {
                                 errorMessage = "Veuillez remplir tous les champs"
                             } else if (!MockRepository.isUserRegistered(email)) {
-                                // VÉRIFICATION BACKEND SIMULÉE
-                                errorMessage = "Utilisateur non inscrit. Veuillez créer un compte."
+                                errorMessage = "Utilisateur non inscrit."
+                            } else if (!MockRepository.verifyPassword(email, password)) {
+                                errorMessage = "Mot de passe incorrect."
+                            } else if (!MockRepository.isUserApproved(email)) {
+                                errorMessage = "Votre compte est en attente de validation par l'administrateur."
                             } else {
                                 isLoading = true
-                                
-                                // Redirection basée sur l'email pour la phase de test
                                 val targetRoute = when {
                                     email.contains("admin", ignoreCase = true) -> Screen.AdminHome.createRoute(email)
                                     email.contains("coach", ignoreCase = true) -> Screen.CoachHome.createRoute(email)
                                     else -> Screen.PlayerHome.createRoute(email)
                                 }
-
                                 navController.navigate(targetRoute) {
                                     popUpTo(Screen.Login.route) { inclusive = true }
                                 }
@@ -150,18 +145,13 @@ fun LoginScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = "Pas encore de compte ? ",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Text("Pas encore de compte ? ", style = MaterialTheme.typography.bodyMedium)
                         Text(
                             text = "S'inscrire",
                             style = MaterialTheme.typography.bodyMedium,
                             color = PrimaryBlue,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.clickable {
-                                navController.navigate(Screen.Register.route)
-                            }
+                            modifier = Modifier.clickable { navController.navigate(Screen.Register.route) }
                         )
                     }
                 }
@@ -169,34 +159,17 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Comptes de test
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.9f)
-                )
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Comptes de test :",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = "Joueur: joueur@test.com / Player123",
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = "Coach: coach@test.com / Coach123",
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = "Admin: admin@test.com / Admin123",
-                        fontSize = 12.sp
-                    )
+                    Text("Accès Administrateur :", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text("Email: admin@amoa.inpt", fontSize = 12.sp)
+                    Text("Mot de passe: amoainpt", fontSize = 12.sp)
                 }
             }
         }

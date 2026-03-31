@@ -24,7 +24,7 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachChatListScreen(navController: NavController) {
+fun CoachChatListScreen(navController: NavController, email: String = "") {
     // Données simulées
     val chats = remember {
         listOf(
@@ -43,13 +43,13 @@ fun CoachChatListScreen(navController: NavController) {
             NavigationBar {
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachHome.route) },
+                    onClick = { navController.navigate(Screen.CoachHome.createRoute(email)) },
                     icon = { Icon(Icons.Default.Home, contentDescription = "Accueil") },
                     label = { Text("Accueil") }
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachSessions.route) },
+                    onClick = { navController.navigate(Screen.CoachSessions.createRoute(email)) },
                     icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Sessions") },
                     label = { Text("Sessions") }
                 )
@@ -67,7 +67,7 @@ fun CoachChatListScreen(navController: NavController) {
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachProfile.route) },
+                    onClick = { navController.navigate(Screen.CoachProfile.createRoute(email)) },
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profil") },
                     label = { Text("Profil") }
                 )
@@ -84,7 +84,7 @@ fun CoachChatListScreen(navController: NavController) {
             ) {
                 items(chats) { chat ->
                     CoachChatListItem(chat) {
-                        navController.navigate(Screen.CoachChat.createRoute(chat.id))
+                        navController.navigate(Screen.CoachChat.createRoute(chat.id, email))
                     }
                     Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 }

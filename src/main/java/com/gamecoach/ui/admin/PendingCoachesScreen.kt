@@ -7,8 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,8 +16,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.gamecoach.model.Coach
-import com.gamecoach.model.CoachStatus
+import com.gamecoach.data.MockRepository
+import com.gamecoach.model.User
+import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.EmptyState
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.navigation.Screen
@@ -27,14 +27,15 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PendingCoachesScreen(navController: NavController, email: String = "admin@test.com") {
-    val pendingCoaches = remember {
-        listOf<Coach>() // Liste vide pour l'instant
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val pendingUsers = remember(refreshTrigger) {
+        MockRepository.getPendingUsers()
     }
 
     Scaffold(
         topBar = {
             GameCoachTopBar(
-                title = "Candidatures en attente",
+                title = "Validations en attente",
                 onBackClick = { navController.navigateUp() },
                 onHomeClick = {
                     navController.navigate(Screen.AdminHome.createRoute(email)) {
@@ -59,36 +60,36 @@ fun PendingCoachesScreen(navController: NavController, email: String = "admin@te
                     modifier = Modifier.padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = Warning
-                    )
-                    Text(
-                        "${pendingCoaches.size} candidature(s) à valider",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Icon(Icons.Default.Info, null, tint = Warning)
+                    Text("${pendingUsers.size} inscription(s) à valider", fontWeight = FontWeight.Bold)
                 }
             }
 
-            if (pendingCoaches.isEmpty()) {
-                EmptyState(
-                    icon = Icons.Default.CheckCircle,
-                    message = "Aucune candidature en attente"
-                )
+            if (pendingUsers.isEmpty()) {
+                EmptyState(icon = Icons.Default.CheckCircle, message = "Toutes les inscriptions sont validées")
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(pendingCoaches) { coach ->
-                        PendingCoachCard(
-                            coach = coach,
-                            onClick = {
-                                navController.navigate(Screen.CoachDetailAdmin.createRoute(coach.id))
+                    items(pendingUsers) { user ->
+                        PendingUserCard(user) {
+                            if (user.role == UserRole.COACH) {
+                                // On cherche le coach correspondant dans les données globales
+                                val coachId = MockRepository.getCoachById(user.id)?.id ?: ""
+                                if (coachId.isNotEmpty()) {
+                                    navController.navigate(Screen.CoachDetailAdmin.createRoute(coachId))
+                                } else {
+                                    // Fallback si pas encore d'ID spécifique
+                                    MockRepository.approveUser(user.email)
+                                    refreshTrigger++
+                                }
+                            } else {
+                                MockRepository.approveUser(user.email)
+                                refreshTrigger++
                             }
-                        )
+                        }
                     }
                 }
             }
@@ -98,66 +99,34 @@ fun PendingCoachesScreen(navController: NavController, email: String = "admin@te
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PendingCoachCard(coach: Coach, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
-    ) {
+fun PendingUserCard(user: User, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Row(
             modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape),
-                color = PrimaryBlue.copy(alpha = 0.1f)
+                modifier = Modifier.size(48.dp).clip(CircleShape),
+                color = if (user.role == UserRole.COACH) PrimaryPurple.copy(alpha = 0.1f) else PrimaryBlue.copy(alpha = 0.1f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        coach.username.first().toString(),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue
-                    )
+                    Text(user.username.take(1).uppercase(), fontWeight = FontWeight.Bold, color = PrimaryBlue)
                 }
             }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(user.username, fontWeight = FontWeight.Bold)
+                Text(user.email, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
                 Text(
-                    coach.username,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(coach.game, fontSize = 14.sp, color = TextSecondary)
-                    Text("•", color = TextSecondary)
-                    Text(
-                        coach.rank,
-                        fontSize = 14.sp,
-                        color = PrimaryBlue,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Text(
-                    "${coach.hourlyRate.toInt()}€/h",
-                    fontSize = 14.sp,
+                    text = if (user.role == UserRole.COACH) "Rôle: Coach" else "Rôle: Joueur",
+                    color = if (user.role == UserRole.COACH) PrimaryPurple else PrimaryBlue,
                     fontWeight = FontWeight.Bold,
-                    color = Success
+                    fontSize = 12.sp
                 )
             }
 
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = TextSecondary
-            )
+            Icon(Icons.Default.ChevronRight, null, tint = TextSecondary)
         }
     }
 }

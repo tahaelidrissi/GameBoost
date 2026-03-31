@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.theme.PrimaryBlue
@@ -18,9 +19,11 @@ import com.gamecoach.ui.theme.Warning
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewCoachScreen(navController: NavController) {
+fun ReviewCoachScreen(navController: NavController, sessionId: String = "") {
     var rating by remember { mutableStateOf(0) }
     var comment by remember { mutableStateOf("") }
+    
+    val session = remember(sessionId) { MockRepository.getSessionById(sessionId) }
 
     Scaffold(
         topBar = {
@@ -37,6 +40,12 @@ fun ReviewCoachScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            Text(
+                text = "Session avec ${session?.coachName ?: "votre coach"}",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -99,7 +108,10 @@ fun ReviewCoachScreen(navController: NavController) {
             GameCoachButton(
                 text = "Confirmer l'évaluation",
                 onClick = {
-                    // TODO: Envoyer l'évaluation
+                    // MISE À JOUR RÉELLE DU SCORE DU COACH
+                    if (session != null) {
+                        MockRepository.updateCoachRating(session.coachName, rating)
+                    }
                     navController.navigateUp()
                 },
                 enabled = rating > 0

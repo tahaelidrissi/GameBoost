@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.gamecoach.model.Session
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.SessionStatus
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
@@ -18,18 +18,19 @@ import com.gamecoach.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachSessionDetailScreen(navController: NavController) {
-    val session = remember {
-        Session(
-            id = "1",
-            playerName = "joueur1",
-            game = "Valorant",
-            scheduledDate = "2024-03-10",
-            scheduledTime = "16:00",
-            duration = 1,
-            amount = 35.0,
-            status = SessionStatus.PENDING
-        )
+fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "1", email: String = "") {
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val session = remember(sessionId, refreshTrigger) {
+        MockRepository.getSessionById(sessionId)
+    }
+
+    if (session == null) {
+        Scaffold { padding ->
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                Text("Session introuvable")
+            }
+        }
+        return
     }
 
     Scaffold(
@@ -65,35 +66,60 @@ fun CoachSessionDetailScreen(navController: NavController) {
 
             Spacer(Modifier.weight(1f))
 
+            // 1. Phase PENDING : Le coach valide
             if (session.status == SessionStatus.PENDING) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { /* TODO: Refuser */ },
+                        onClick = { 
+                            MockRepository.updateSessionStatus(session.id, SessionStatus.REJECTED)
+                            navController.navigateUp()
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Refuser")
                     }
                     GameCoachButton(
                         text = "Accepter",
-                        onClick = { /* TODO: Accepter */ },
+                        onClick = { 
+                            MockRepository.validateSessionByCoach(session.id)
+                            refreshTrigger++
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
 
+            // 2. Phase AWAITING_PAYMENT : Le coach attend simplement
+            if (session.status == SessionStatus.AWAITING_PAYMENT) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Text(
+                        "En attente du paiement par le joueur...",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            // 3. Phase ACCEPTED (Payé) : Le coach peut terminer
             if (session.status == SessionStatus.ACCEPTED) {
                 GameCoachButton(
                     text = "Terminer la session",
-                    onClick = { /* TODO: Terminer */ }
+                    onClick = { 
+                        MockRepository.completeSession(session.id)
+                        refreshTrigger++
+                    }
                 )
             }
 
             OutlinedButton(
                 onClick = {
-                    navController.navigate(Screen.CoachChat.createRoute(session.id))
+                    navController.navigate(Screen.CoachChat.createRoute(session.id, email))
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

@@ -2,96 +2,100 @@ package com.gamecoach.data
 
 import com.gamecoach.model.*
 import java.util.UUID
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object MockRepository {
     // Liste des utilisateurs inscrits (simulation base de données)
     private val registeredUsers = mutableListOf(
-        User(id = "1", username = "Joueur", email = "joueur@test.com", role = UserRole.PLAYER, createdAt = "10 Janvier 2024"),
-        User(id = "2", username = "Coach", email = "coach@test.com", role = UserRole.COACH, createdAt = "15 Février 2024"),
-        User(id = "3", username = "Admin", email = "admin@test.com", role = UserRole.ADMIN, createdAt = "01 Janvier 2024")
+        User(id = "3", username = "Admin", email = "admin@amoa.inpt", role = UserRole.ADMIN, status = UserStatus.APPROVED, createdAt = "01/01/2024")
     )
 
-    // Liste des coachs disponibles
+    // Mappage des mots de passe (pour la simulation)
+    private val userPasswords = mutableMapOf(
+        "admin@amoa.inpt" to "amoainpt"
+    )
+
+    // Liste des coachs détaillés
     private val coaches = mutableListOf(
         Coach(id = "1", username = "ProBoost", game = "Valorant", rank = "Radiant", hourlyRate = 35.0, rating = 4.8, totalReviews = 42, status = CoachStatus.APPROVED),
-        Coach(id = "2", username = "LeagueExpert", game = "League of Legends", rank = "Challenger", hourlyRate = 40.0, rating = 4.9, totalReviews = 87, status = CoachStatus.APPROVED),
-        Coach(id = "3", username = "CS2Expert", game = "Counter-Strike 2", rank = "Global Elite", hourlyRate = 30.0, rating = 4.7, totalReviews = 35, status = CoachStatus.APPROVED),
-        Coach(id = "4", username = "OverwatchPro", game = "Overwatch 2", rank = "Grandmaster", hourlyRate = 25.0, rating = 4.6, totalReviews = 28, status = CoachStatus.APPROVED)
+        Coach(id = "2", username = "LeagueExpert", game = "League of Legends", rank = "Challenger", hourlyRate = 40.0, rating = 4.9, totalReviews = 87, status = CoachStatus.APPROVED)
     )
 
-    // Liste des sessions (simulation base de données)
-    private val sessions = mutableListOf(
-        Session(
-            id = "1",
-            playerId = "1",
-            playerName = "Joueur",
-            coachName = "ProBoost",
-            game = "Valorant",
-            scheduledDate = "10/03/2024",
-            scheduledTime = "16:00",
-            duration = 1,
-            amount = 35.0,
-            status = SessionStatus.PENDING
-        ),
-        Session(
-            id = "2",
-            playerId = "1",
-            playerName = "Joueur",
-            coachName = "LeagueExpert",
-            game = "LoL",
-            scheduledDate = "08/03/2024",
-            scheduledTime = "14:00",
-            duration = 2,
-            amount = 80.0,
-            status = SessionStatus.ACCEPTED,
-            isPaid = false
-        ),
-        Session(
-            id = "3",
-            playerId = "1",
-            playerName = "Joueur",
-            coachName = "CS2Expert",
-            game = "Counter-Strike 2",
-            scheduledDate = "28/02/2024",
-            scheduledTime = "16:00",
-            duration = 2,
-            amount = 70.0,
-            status = SessionStatus.COMPLETED,
-            isPaid = true
-        )
-    )
+    // Liste des sessions
+    private val sessions = mutableListOf<Session>()
 
-    // --- Gestion des Coachs ---
-    fun getCoachById(id: String): Coach? = coaches.find { it.id == id }
-    fun getAllCoaches(): List<Coach> = coaches
+    // Liste globale des messages (simulation de base de données de chat)
+    private val messages = mutableListOf<Message>()
 
-    // --- Validation Inscription/Connexion ---
+    // --- Gestion des Utilisateurs (Cycle Admin) ---
     
-    fun registerUser(user: User) {
+    fun registerUser(user: User, coachInfo: Coach? = null) {
         if (registeredUsers.none { it.email.equals(user.email, ignoreCase = true) }) {
-            registeredUsers.add(user.copy(createdAt = "Aujourd'hui"))
+            registeredUsers.add(user.copy(status = UserStatus.PENDING, createdAt = "Aujourd'hui"))
+            if (user.role == UserRole.COACH && coachInfo != null) {
+                coaches.add(coachInfo.copy(status = CoachStatus.PENDING, id = user.id))
+            }
         }
     }
 
-    fun isUserRegistered(email: String): Boolean {
-        return registeredUsers.any { it.email.equals(email, ignoreCase = true) }
+    fun getPendingUsers(): List<User> = registeredUsers.filter { it.status == UserStatus.PENDING }
+
+    fun approveUser(email: String) {
+        val index = registeredUsers.indexOfFirst { it.email.equals(email, ignoreCase = true) }
+        if (index != -1) {
+            val user = registeredUsers[index]
+            registeredUsers[index] = user.copy(status = UserStatus.APPROVED)
+            if (user.role == UserRole.COACH) {
+                val coachIndex = coaches.indexOfFirst { it.email.equals(email, ignoreCase = true) }
+                if (coachIndex != -1) {
+                    coaches[coachIndex] = coaches[coachIndex].copy(status = CoachStatus.APPROVED)
+                }
+            }
+        }
     }
 
-    fun getUserByEmail(email: String): User? {
-        return registeredUsers.find { it.email.equals(email, ignoreCase = true) }
+    fun isUserApproved(email: String): Boolean {
+        return registeredUsers.find { it.email.equals(email, ignoreCase = true) }?.status == UserStatus.APPROVED
     }
+
+    fun isUserRegistered(email: String): Boolean = registeredUsers.any { it.email.equals(email, ignoreCase = true) }
+    
+    fun verifyPassword(email: String, pass: String): Boolean {
+        if (email.equals("admin@amoa.inpt", ignoreCase = true)) {
+            return userPasswords[email] == pass
+        }
+        return true 
+    }
+
+    fun getUserByEmail(email: String): User? = registeredUsers.find { it.email.equals(email, ignoreCase = true) }
 
     fun updateUsername(email: String, newUsername: String) {
         val index = registeredUsers.indexOfFirst { it.email.equals(email, ignoreCase = true) }
         if (index != -1) {
             val oldName = registeredUsers[index].username
             registeredUsers[index] = registeredUsers[index].copy(username = newUsername)
-            
-            // Mettre à jour le nom dans les sessions existantes pour la cohérence
             sessions.forEachIndexed { i, s ->
                 if (s.playerName == oldName) sessions[i] = s.copy(playerName = newUsername)
                 if (s.coachName == oldName) sessions[i] = s.copy(coachName = newUsername)
             }
+        }
+    }
+
+    // --- Gestion des Coachs ---
+    fun getCoachById(id: String): Coach? = coaches.find { it.id == id }
+    fun getPendingCoaches(): List<Coach> = coaches.filter { it.status == CoachStatus.PENDING }
+    fun getAllCoachesForPlayers(): List<Coach> = coaches.filter { it.status == CoachStatus.APPROVED }
+
+    fun updateCoachRating(coachName: String, newRating: Int) {
+        val coach = coaches.find { it.username.equals(coachName, ignoreCase = true) }
+        if (coach != null) {
+            val totalPoints = coach.rating * coach.totalReviews
+            val newTotalReviews = coach.totalReviews + 1
+            val updatedRating = (totalPoints + newRating) / newTotalReviews
+            val index = coaches.indexOf(coach)
+            coaches[index] = coach.copy(rating = updatedRating, totalReviews = newTotalReviews)
         }
     }
 
@@ -110,24 +114,52 @@ object MockRepository {
         }
     }
 
-    fun getUserStats(email: String): Pair<Int, Int> {
-        val userSessions = getSessionsForUser(email)
-        val count = userSessions.size
-        val hours = userSessions.sumOf { it.duration }
-        return Pair(count, hours)
+    fun updateSessionStatus(sessionId: String, status: SessionStatus) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index != -1) {
+            sessions[index] = sessions[index].copy(status = status)
+        }
+    }
+
+    fun validateSessionByCoach(sessionId: String) {
+        updateSessionStatus(sessionId, SessionStatus.AWAITING_PAYMENT)
+    }
+
+    fun confirmPayment(sessionId: String) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index != -1 && sessions[index].status == SessionStatus.AWAITING_PAYMENT) {
+            sessions[index] = sessions[index].copy(status = SessionStatus.ACCEPTED, isPaid = true)
+        }
+    }
+
+    fun completeSession(sessionId: String) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index != -1 && sessions[index].status == SessionStatus.ACCEPTED) {
+            sessions[index] = sessions[index].copy(status = SessionStatus.COMPLETED)
+        }
     }
 
     fun getSessionById(id: String): Session? = sessions.find { it.id == id }
 
-    fun canPaySession(sessionId: String): Boolean {
-        val session = getSessionById(sessionId)
-        return session != null && session.status == SessionStatus.ACCEPTED && !session.isPaid
+    fun getUserStats(email: String): Pair<Int, Double> {
+        val user = getUserByEmail(email) ?: return Pair(0, 0.0)
+        val userSessions = getSessionsForUser(email)
+        return if (user.role == UserRole.COACH) {
+            val completed = userSessions.filter { it.status == SessionStatus.COMPLETED }
+            Pair(completed.size, completed.sumOf { it.amount })
+        } else {
+            val completed = userSessions.filter { it.status == SessionStatus.COMPLETED }
+            Pair(completed.size, completed.sumOf { it.duration }.toDouble())
+        }
     }
 
-    fun markSessionAsPaid(sessionId: String) {
-        val index = sessions.indexOfFirst { it.id == sessionId }
-        if (index != -1 && sessions[index].status == SessionStatus.ACCEPTED) {
-            sessions[index] = sessions[index].copy(isPaid = true)
-        }
+    // --- Gestion du Chat ---
+
+    fun sendMessage(message: Message) {
+        messages.add(message)
+    }
+
+    fun getMessagesForSession(sessionId: String): List<Message> {
+        return messages.filter { it.sessionId == sessionId }
     }
 }

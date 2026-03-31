@@ -37,8 +37,8 @@ fun PlayerSessionsScreen(navController: NavController, email: String = "joueur@t
     val filteredSessions = remember(selectedTab, allSessions) {
         when (selectedTab) {
             0 -> allSessions
-            1 -> allSessions.filter { it.status == SessionStatus.PENDING }
-            2 -> allSessions.filter { it.status == SessionStatus.ACCEPTED || it.status == SessionStatus.IN_PROGRESS }
+            1 -> allSessions.filter { it.status == SessionStatus.PENDING || it.status == SessionStatus.AWAITING_PAYMENT }
+            2 -> allSessions.filter { it.status == SessionStatus.ACCEPTED }
             3 -> allSessions.filter { it.status == SessionStatus.COMPLETED }
             else -> allSessions
         }

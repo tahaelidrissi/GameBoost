@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gamecoach.data.MockRepository
+import com.gamecoach.model.Coach
+import com.gamecoach.model.CoachStatus
 import com.gamecoach.model.User
 import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.GameCoachButton
@@ -25,6 +28,7 @@ import com.gamecoach.ui.components.GameCoachTextField
 import com.gamecoach.ui.navigation.Screen
 import com.gamecoach.ui.theme.PrimaryBlue
 import com.gamecoach.ui.theme.PrimaryPurple
+import com.gamecoach.util.Constants
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +38,12 @@ fun RegisterScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var selectedRole by remember { mutableStateOf(UserRole.PLAYER) }
+    
+    // Coach specific fields
+    var coachGame by remember { mutableStateOf("") }
+    var coachRank by remember { mutableStateOf("") }
+    var isGameDropdownExpanded by remember { mutableStateOf(false) }
+    
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -79,6 +89,7 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Card d'inscription
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -121,12 +132,6 @@ fun RegisterScreen(navController: NavController) {
                     )
 
                     Text(
-                        text = "Min. 8 caractères",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Text(
                         text = "Je suis un",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
@@ -151,6 +156,56 @@ fun RegisterScreen(navController: NavController) {
                         )
                     }
 
+                    // Coach specific UI
+                    if (selectedRole == UserRole.COACH) {
+                        Divider()
+                        Text(
+                            text = "Informations de Coaching",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        // Game Selection Dropdown
+                        ExposedDropdownMenuBox(
+                            expanded = isGameDropdownExpanded,
+                            onExpandedChange = { isGameDropdownExpanded = !isGameDropdownExpanded },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            OutlinedTextField(
+                                value = coachGame,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Sélectionnez votre jeu") },
+                                leadingIcon = { Icon(Icons.Default.Gamepad, contentDescription = null) },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGameDropdownExpanded) },
+                                colors = OutlinedTextFieldDefaults.colors(),
+                                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = isGameDropdownExpanded,
+                                onDismissRequest = { isGameDropdownExpanded = false }
+                            ) {
+                                Constants.GAMES.forEach { game ->
+                                    DropdownMenuItem(
+                                        text = { Text(game) },
+                                        onClick = {
+                                            coachGame = game
+                                            isGameDropdownExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        GameCoachTextField(
+                            value = coachRank,
+                            onValueChange = { coachRank = it },
+                            label = "Votre Rang (ex: Radiant)",
+                            leadingIcon = Icons.Default.EmojiEvents
+                        )
+                    }
+
                     if (errorMessage.isNotEmpty()) {
                         Text(
                             text = errorMessage,
@@ -166,19 +221,37 @@ fun RegisterScreen(navController: NavController) {
                         onClick = {
                             if (username.isBlank() || email.isBlank() || password.isBlank()) {
                                 errorMessage = "Veuillez remplir tous les champs"
+                            } else if (selectedRole == UserRole.COACH && (coachGame.isBlank() || coachRank.isBlank())) {
+                                errorMessage = "Veuillez préciser votre jeu et votre rang"
                             } else if (password.length < 8) {
                                 errorMessage = "Le mot de passe doit contenir au moins 8 caractères"
                             } else {
                                 isLoading = true
-                                // Simulation BACKEND : Inscription réelle dans le MockRepository
+                                val userId = UUID.randomUUID().toString()
+                                
+                                val coachInfo = if (selectedRole == UserRole.COACH) {
+                                    Coach(
+                                        id = UUID.randomUUID().toString(),
+                                        userId = userId,
+                                        username = username,
+                                        email = email,
+                                        game = coachGame,
+                                        rank = coachRank,
+                                        status = CoachStatus.PENDING,
+                                        hourlyRate = 30.0
+                                    )
+                                } else null
+
                                 MockRepository.registerUser(
                                     User(
-                                        id = UUID.randomUUID().toString(),
+                                        id = userId,
                                         username = username,
                                         email = email,
                                         role = selectedRole
-                                    )
+                                    ),
+                                    coachInfo = coachInfo
                                 )
+
                                 navController.navigate(Screen.Login.route) {
                                     popUpTo(Screen.Register.route) { inclusive = true }
                                 }

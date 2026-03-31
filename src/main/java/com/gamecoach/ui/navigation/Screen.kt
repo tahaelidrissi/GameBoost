@@ -32,15 +32,15 @@ sealed class Screen(val route: String) {
     object SessionDetail : Screen("session_detail/{sessionId}?email={email}") {
         fun createRoute(sessionId: String, email: String) = "session_detail/$sessionId?email=$email"
     }
-    object Chat : Screen("chat/{sessionId}") {
-        fun createRoute(sessionId: String) = "chat/$sessionId"
+    object Chat : Screen("chat/{sessionId}?email={email}") {
+        fun createRoute(sessionId: String, email: String) = "chat/$sessionId?email=$email"
     }
     object PlayerChatList : Screen("player_chat_list")
-    object ReviewCoach : Screen("review_coach/{sessionId}") {
-        fun createRoute(sessionId: String) = "review_coach/$sessionId"
+    object ReviewCoach : Screen("review_coach/{sessionId}?email={email}") {
+        fun createRoute(sessionId: String, email: String) = "review_coach/$sessionId?email=$email"
     }
-    object Payment : Screen("payment/{sessionId}") {
-        fun createRoute(sessionId: String) = "payment/$sessionId"
+    object Payment : Screen("payment/{sessionId}?email={email}") {
+        fun createRoute(sessionId: String, email: String) = "payment/$sessionId?email=$email"
     }
 
     // Coach
@@ -55,11 +55,11 @@ sealed class Screen(val route: String) {
     object CoachSessions : Screen("coach_sessions?email={email}") {
         fun createRoute(email: String) = "coach_sessions?email=$email"
     }
-    object CoachSessionDetail : Screen("coach_session_detail/{sessionId}") {
-        fun createRoute(sessionId: String) = "coach_session_detail/$sessionId"
+    object CoachSessionDetail : Screen("coach_session_detail/{sessionId}?email={email}") {
+        fun createRoute(sessionId: String, email: String) = "coach_session_detail/$sessionId?email=$email"
     }
-    object CoachChat : Screen("coach_chat/{sessionId}") {
-        fun createRoute(sessionId: String) = "coach_chat/$sessionId"
+    object CoachChat : Screen("coach_chat/{sessionId}?email={email}") {
+        fun createRoute(sessionId: String, email: String) = "coach_chat/$sessionId?email=$email"
     }
     object CoachChatList : Screen("coach_chat_list")
     object Revenue : Screen("revenue")

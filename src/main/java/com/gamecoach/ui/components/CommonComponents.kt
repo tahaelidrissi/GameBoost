@@ -312,6 +312,7 @@ fun InfoRow(
 fun SessionStatusBadge(status: SessionStatus) {
     val (color, text) = when (status) {
         SessionStatus.PENDING -> Warning to "En attente de confirmation du coach"
+        SessionStatus.AWAITING_PAYMENT -> Warning to "En attente de paiement"
         SessionStatus.ACCEPTED -> Success to "Acceptée"
         SessionStatus.REJECTED -> Error to "Refusée"
         SessionStatus.IN_PROGRESS -> PrimaryBlue to "En cours"

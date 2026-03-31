@@ -24,7 +24,7 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerChatListScreen(navController: NavController) {
+fun PlayerChatListScreen(navController: NavController, email: String = "") {
     // Données simulées
     val chats = remember {
         listOf(
@@ -43,19 +43,19 @@ fun PlayerChatListScreen(navController: NavController) {
             NavigationBar {
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.PlayerHome.route) },
+                    onClick = { navController.navigate(Screen.PlayerHome.createRoute(email)) },
                     icon = { Icon(Icons.Default.Home, contentDescription = "Accueil") },
                     label = { Text("Accueil") }
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachList.route) },
+                    onClick = { navController.navigate(Screen.CoachList.createRoute(email)) },
                     icon = { Icon(Icons.Default.Search, contentDescription = "Coachs") },
                     label = { Text("Coachs") }
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.PlayerSessions.route) },
+                    onClick = { navController.navigate(Screen.PlayerSessions.createRoute(email)) },
                     icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Sessions") },
                     label = { Text("Sessions") }
                 )
@@ -67,7 +67,7 @@ fun PlayerChatListScreen(navController: NavController) {
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.Profile.route) },
+                    onClick = { navController.navigate(Screen.Profile.createRoute(email)) },
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profil") },
                     label = { Text("Profil") }
                 )
@@ -84,7 +84,7 @@ fun PlayerChatListScreen(navController: NavController) {
             ) {
                 items(chats) { chat ->
                     ChatListItem(chat) {
-                        navController.navigate(Screen.Chat.createRoute(chat.id))
+                        navController.navigate(Screen.Chat.createRoute(chat.id, email))
                     }
                     Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 }

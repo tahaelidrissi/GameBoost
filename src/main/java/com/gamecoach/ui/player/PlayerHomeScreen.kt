@@ -29,7 +29,9 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
     val username = user?.username ?: email.substringBefore("@").replaceFirstChar { it.uppercase() }
     
     // Récupération dynamique des statistiques depuis le repository
-    val (sessionCount, totalHours) = remember(email) { MockRepository.getUserStats(email) }
+    val stats = remember(email) { MockRepository.getUserStats(email) }
+    val sessionCount = stats.first
+    val totalHours = stats.second.toInt()
 
     Scaffold(
         topBar = {
@@ -52,7 +54,7 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachList.route) },
+                    onClick = { navController.navigate(Screen.CoachList.createRoute(email)) },
                     icon = { Icon(Icons.Default.Search, contentDescription = "Coachs") },
                     label = { Text("Coachs") }
                 )
@@ -124,7 +126,7 @@ fun PlayerHomeScreen(navController: NavController, email: String = "joueur@test.
             ) {
                 Card(
                     modifier = Modifier.weight(1f),
-                    onClick = { navController.navigate(Screen.CoachList.route) },
+                    onClick = { navController.navigate(Screen.CoachList.createRoute(email)) },
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(

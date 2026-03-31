@@ -36,7 +36,7 @@ fun CoachSessionsScreen(navController: NavController, email: String = "coach@tes
     val filteredSessions = remember(selectedTab, allSessions) {
         when (selectedTab) {
             0 -> allSessions
-            1 -> allSessions.filter { it.status == SessionStatus.PENDING }
+            1 -> allSessions.filter { it.status == SessionStatus.PENDING || it.status == SessionStatus.AWAITING_PAYMENT }
             2 -> allSessions.filter { it.status == SessionStatus.ACCEPTED || it.status == SessionStatus.IN_PROGRESS }
             3 -> allSessions.filter { it.status == SessionStatus.COMPLETED }
             else -> allSessions
@@ -86,7 +86,7 @@ fun CoachSessionsScreen(navController: NavController, email: String = "coach@tes
                         SessionCard(
                             session = session,
                             onClick = {
-                                navController.navigate(Screen.CoachSessionDetail.createRoute(session.id))
+                                navController.navigate(Screen.CoachSessionDetail.createRoute(session.id, email))
                             }
                         )
                     }

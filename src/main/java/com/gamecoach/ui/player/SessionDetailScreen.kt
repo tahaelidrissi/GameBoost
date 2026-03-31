@@ -20,7 +20,7 @@ import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SessionDetailScreen(navController: NavController, sessionId: String = "1") {
+fun SessionDetailScreen(navController: NavController, sessionId: String = "1", email: String = "") {
     // Récupération dynamique de la session depuis le "Backend" simulé
     val session = remember(sessionId) {
         MockRepository.getSessionById(sessionId)
@@ -42,7 +42,7 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1") {
                 title = "Détails de la session",
                 onBackClick = { navController.navigateUp() },
                 onHomeClick = { 
-                    navController.navigate(Screen.PlayerHome.createRoute("joueur@test.com")) {
+                    navController.navigate(Screen.PlayerHome.createRoute(email)) {
                         popUpTo(Screen.PlayerHome.route) { inclusive = true }
                     }
                 }
@@ -95,12 +95,12 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1") {
 
             // Actions Dynamiques : Affichage selon les règles métier
             
-            // RÈGLE : Le bouton payer n'apparaît QUE si la session est ACCEPTÉE et NON PAYÉE
-            if (MockRepository.canPaySession(session.id)) {
+            // RÈGLE : Le bouton payer n'apparaît QUE si la session est en attente de paiement (validée par coach)
+            if (session.status == SessionStatus.AWAITING_PAYMENT) {
                 GameCoachButton(
                     text = "Payer la session",
                     onClick = {
-                        navController.navigate(Screen.Payment.createRoute(session.id))
+                        navController.navigate(Screen.Payment.createRoute(session.id, email))
                     }
                 )
             }
@@ -109,14 +109,14 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1") {
                 GameCoachButton(
                     text = "Évaluer le coach",
                     onClick = {
-                        navController.navigate(Screen.ReviewCoach.createRoute(session.id))
+                        navController.navigate(Screen.ReviewCoach.createRoute(session.id, email))
                     }
                 )
             }
 
             OutlinedButton(
                 onClick = {
-                    navController.navigate(Screen.Chat.createRoute(session.id))
+                    navController.navigate(Screen.Chat.createRoute(session.id, email))
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
