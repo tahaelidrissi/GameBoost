@@ -21,13 +21,12 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionDetailScreen(navController: NavController, sessionId: String = "1", email: String = "") {
-    // Récupération dynamique de la session depuis le "Backend" simulé
-    val session = remember(sessionId) {
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val session = remember(sessionId, refreshTrigger) {
         MockRepository.getSessionById(sessionId)
     }
 
     if (session == null) {
-        // Gérer le cas où la session n'existe pas
         Scaffold { padding ->
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
                 Text("Session introuvable")
@@ -59,7 +58,7 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1", e
             // Statut
             SessionStatusBadge(session.status)
             
-            if (session.isPaid) {
+            if (session.isPaid && session.status != SessionStatus.CANCELLED) {
                 Surface(
                     color = Success.copy(alpha = 0.1f),
                     shape = MaterialTheme.shapes.small,
@@ -93,9 +92,25 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1", e
 
             Spacer(Modifier.weight(1f))
 
-            // Actions Dynamiques : Affichage selon les règles métier
+            // Actions Dynamiques
             
-            // RÈGLE : Le bouton payer n'apparaît QUE si la session est en attente de paiement (validée par coach)
+            // Possibilité d'annuler AVANT le paiement (PENDING ou AWAITING_PAYMENT)
+            if (session.status == SessionStatus.PENDING || session.status == SessionStatus.AWAITING_PAYMENT) {
+                OutlinedButton(
+                    onClick = {
+                        MockRepository.updateSessionStatus(session.id, SessionStatus.CANCELLED)
+                        refreshTrigger++
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
+                ) {
+                    Icon(Icons.Default.Cancel, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Annuler la séance")
+                }
+            }
+
+            // Le bouton payer n'apparaît QUE si la session est AWAITING_PAYMENT
             if (session.status == SessionStatus.AWAITING_PAYMENT) {
                 GameCoachButton(
                     text = "Payer la session",
@@ -114,15 +129,17 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1", e
                 )
             }
 
-            OutlinedButton(
-                onClick = {
-                    navController.navigate(Screen.Chat.createRoute(session.id, email))
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Chat, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Discuter avec le coach")
+            if (session.status != SessionStatus.CANCELLED) {
+                OutlinedButton(
+                    onClick = {
+                        navController.navigate(Screen.Chat.createRoute(session.id, email))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Chat, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Discuter avec le coach")
+                }
             }
         }
     }

@@ -15,6 +15,7 @@ import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.components.InfoRow
 import com.gamecoach.ui.components.SessionStatusBadge
 import com.gamecoach.ui.navigation.Screen
+import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +67,9 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
 
             Spacer(Modifier.weight(1f))
 
-            // 1. Phase PENDING : Le coach valide
+            // ACTIONS DU COACH
+            
+            // 1. Phase PENDING : Le coach valide ou refuse
             if (session.status == SessionStatus.PENDING) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -74,12 +77,13 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                 ) {
                     OutlinedButton(
                         onClick = { 
-                            MockRepository.updateSessionStatus(session.id, SessionStatus.REJECTED)
-                            navController.navigateUp()
+                            MockRepository.updateSessionStatus(session.id, SessionStatus.CANCELLED)
+                            refreshTrigger++
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
                     ) {
-                        Text("Refuser")
+                        Text("Annuler/Refuser")
                     }
                     GameCoachButton(
                         text = "Accepter",
@@ -92,17 +96,32 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                 }
             }
 
-            // 2. Phase AWAITING_PAYMENT : Le coach attend simplement
+            // 2. Phase AWAITING_PAYMENT : Le coach peut encore annuler
             if (session.status == SessionStatus.AWAITING_PAYMENT) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Text(
-                        "En attente du paiement par le joueur...",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Text(
+                            "En attente du paiement par le joueur...",
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    
+                    OutlinedButton(
+                        onClick = {
+                            MockRepository.updateSessionStatus(session.id, SessionStatus.CANCELLED)
+                            refreshTrigger++
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
+                    ) {
+                        Icon(Icons.Default.Cancel, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Annuler la séance")
+                    }
                 }
             }
 
@@ -117,15 +136,17 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                 )
             }
 
-            OutlinedButton(
-                onClick = {
-                    navController.navigate(Screen.CoachChat.createRoute(session.id, email))
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Chat, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Discuter avec le joueur")
+            if (session.status != SessionStatus.CANCELLED) {
+                OutlinedButton(
+                    onClick = {
+                        navController.navigate(Screen.CoachChat.createRoute(session.id, email))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Chat, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Discuter avec le joueur")
+                }
             }
         }
     }
