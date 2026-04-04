@@ -1,0 +1,33 @@
+package com.gamecoach
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.gamecoach.ui.navigation.NavGraph
+import com.gamecoach.ui.navigation.Screen
+import com.gamecoach.ui.theme.GameCoachTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            GameCoachTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    NavGraph(
+                        navController = navController,
+                        startDestination = Screen.Splash.route
+                    )
+                }
+            }
+        }
+    }
+}
