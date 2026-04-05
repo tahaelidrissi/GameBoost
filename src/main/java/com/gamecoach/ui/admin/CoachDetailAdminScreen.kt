@@ -100,7 +100,7 @@ fun CoachDetailAdminScreen(navController: NavController) {
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
-                            "⏳ En attente de validation",
+                            "⏳ Nouvel inscrit",
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                             color = Color.White,
                             fontWeight = FontWeight.Bold
@@ -109,7 +109,7 @@ fun CoachDetailAdminScreen(navController: NavController) {
                 }
             }
 
-            // Informations
+            // Informations de base uniquement pour un nouvel inscrit
             Card {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -118,66 +118,7 @@ fun CoachDetailAdminScreen(navController: NavController) {
                     Text("Informations", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Divider()
                     InfoRow(Icons.Default.Email, "Email", coach.email)
-                    InfoRow(Icons.Default.SportsEsports, "Jeu", coach.game)
-                    InfoRow(Icons.Default.EmojiEvents, "Rang", coach.rank)
-                    InfoRow(Icons.Default.AttachMoney, "Tarif horaire", "${coach.hourlyRate}€/h")
-                }
-            }
-
-            // Bio
-            Card {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text("Biographie", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Divider()
-                    Text(coach.bio, color = TextSecondary)
-                }
-            }
-
-            // Preuve
-            Card {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text("Preuve de rang", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Divider()
-
-                    if (coach.proofImageBase64 != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(coach.proofImageBase64),
-                            contentDescription = "Preuve de rang",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.Image,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(48.dp),
-                                    tint = TextSecondary
-                                )
-                                Text(
-                                    "Aucune preuve fournie",
-                                    color = TextSecondary
-                                )
-                            }
-                        }
-                    }
+                    InfoRow(Icons.Default.SportsEsports, "Jeu souhaité", coach.game)
                 }
             }
 

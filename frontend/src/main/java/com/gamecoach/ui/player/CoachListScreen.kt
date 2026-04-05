@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gamecoach.model.Coach
 import com.gamecoach.model.CoachStatus
+import com.gamecoach.ui.components.EmptyState
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.navigation.Screen
 import com.gamecoach.ui.theme.*
@@ -30,146 +31,63 @@ import com.gamecoach.util.Constants
 fun CoachListScreen(navController: NavController, email: String = "joueur@test.com") {
     var searchQuery by remember { mutableStateOf("") }
     var selectedGame by remember { mutableStateOf<String?>(null) }
-    var showFilterDialog by remember { mutableStateOf(false) }
 
-    // Données simulées
-    val coaches = remember {
-        listOf(
-            Coach(
-                id = "1",
-                username = "ProValorant",
-                game = "Valorant",
-                rank = "Radiant",
-                hourlyRate = 35.0,
-                rating = 4.8,
-                totalReviews = 42,
-                status = CoachStatus.APPROVED
-            ),
-            Coach(
-                id = "2",
-                username = "LeagueGuru",
-                game = "League of Legends",
-                rank = "Challenger",
-                hourlyRate = 40.0,
-                rating = 4.9,
-                totalReviews = 87,
-                status = CoachStatus.APPROVED
-            ),
-            Coach(
-                id = "3",
-                username = "CS2Expert",
-                game = "Counter-Strike 2",
-                rank = "Global Elite",
-                hourlyRate = 30.0,
-                rating = 4.7,
-                totalReviews = 35,
-                status = CoachStatus.APPROVED
-            ),
-            Coach(
-                id = "4",
-                username = "OverwatchPro",
-                game = "Overwatch 2",
-                rank = "Grandmaster",
-                hourlyRate = 25.0,
-                rating = 4.6,
-                totalReviews = 28,
-                status = CoachStatus.APPROVED
-            )
+    // Simuler une liste qui contient des coachs avec différents statuts
+    val allCoaches = remember {
+        mutableStateListOf(
+            Coach(id = "1", username = "ProValorant", game = "Valorant", status = CoachStatus.APPROVED, rating = 4.8, hourlyRate = 35.0, rank = "Radiant"),
+            Coach(id = "2", username = "NewbieCoach", game = "LoL", status = CoachStatus.PENDING) // Ne doit pas s'afficher
         )
     }
 
-    val filteredCoaches = coaches.filter { coach ->
+    // Filtrer pour ne garder QUE les coachs approuvés et ceux qui correspondent à la recherche
+    val visibleCoaches = allCoaches.filter { coach ->
+        coach.status == CoachStatus.APPROVED &&
         (selectedGame == null || coach.game == selectedGame) &&
-                (searchQuery.isEmpty() || coach.username.contains(searchQuery, ignoreCase = true) ||
-                        coach.game.contains(searchQuery, ignoreCase = true))
+        (searchQuery.isEmpty() || coach.username.contains(searchQuery, ignoreCase = true))
     }
 
     Scaffold(
         topBar = {
             GameCoachTopBar(
                 title = "Trouver un Coach",
-                onBackClick = { navController.navigateUp() },
-                onHomeClick = {
-                    navController.navigate(Screen.PlayerHome.createRoute(email)) {
-                        popUpTo(Screen.PlayerHome.route) { inclusive = true }
-                    }
-                }
+                onBackClick = { navController.navigateUp() }
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            // Barre de recherche et filtre
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+            if (visibleCoaches.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    EmptyState(
+                        icon = Icons.Default.School,
+                        message = "Aucun coach disponible pour le moment."
+                    )
+                }
+            } else {
+                // Barre de recherche
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    modifier = Modifier.weight(1f),
-                    placeholder = { Text("Rechercher par nom, jeu ou rang...") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = null)
-                    },
-                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    placeholder = { Text("Rechercher un coach...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                FilledTonalButton(
-                    onClick = { showFilterDialog = true },
-                    modifier = Modifier.height(56.dp)
+                // Liste complète
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(Icons.Default.FilterList, contentDescription = "Filtrer")
-                }
-            }
-
-            // Chips de jeux
-            LazyRow(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                item {
-                    FilterChip(
-                        selected = selectedGame == null,
-                        onClick = { selectedGame = null },
-                        label = { Text("Tous les jeux") }
-                    )
-                }
-                items(Constants.GAMES) { game ->
-                    FilterChip(
-                        selected = selectedGame == game,
-                        onClick = { selectedGame = game },
-                        label = { Text(game) }
-                    )
-                }
-            }
-
-            Text(
-                text = "${filteredCoaches.size} coachs disponibles",
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Liste des coachs
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(filteredCoaches) { coach ->
-                    CoachCard(
-                        coach = coach,
-                        onClick = {
-                            navController.navigate(Screen.CoachDetail.createRoute(coach.id, email))
-                        }
-                    )
+                    items(visibleCoaches) { coach ->
+                        CoachCard(
+                            coach = coach,
+                            onClick = {
+                                navController.navigate(Screen.CoachDetail.createRoute(coach.id, email))
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -182,96 +100,20 @@ fun CoachCard(coach: Coach, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Avatar
-            Surface(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape),
-                color = PrimaryBlue.copy(alpha = 0.1f)
-            ) {
+        Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Surface(modifier = Modifier.size(56.dp).clip(CircleShape), color = PrimaryBlue.copy(alpha = 0.1f)) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = coach.username.first().toString(),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue
-                    )
+                    Text(coach.username.first().toString(), fontWeight = FontWeight.Bold, color = PrimaryBlue)
                 }
             }
-
-            // Informations
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = coach.username,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = coach.game,
-                        fontSize = 14.sp,
-                        color = TextSecondary
-                    )
-                    Text("•", color = TextSecondary)
-                    Text(
-                        text = coach.rank,
-                        fontSize = 14.sp,
-                        color = PrimaryBlue,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Warning,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = String.format("%.1f", coach.rating),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "(${coach.totalReviews})",
-                        fontSize = 14.sp,
-                        color = TextSecondary
-                    )
-                    Text("•", color = TextSecondary)
-                    Text(
-                        text = "${coach.hourlyRate.toInt()}€/h",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Success
-                    )
-                }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(coach.username, fontWeight = FontWeight.Bold)
+                Text("${coach.game} • ${coach.rank}", color = TextSecondary, fontSize = 14.sp)
+                Text("${coach.hourlyRate}€/h", color = Success, fontWeight = FontWeight.Bold)
             }
-
-            // Bouton
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = TextSecondary
-            )
+            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = TextSecondary)
         }
     }
 }
