@@ -27,10 +27,8 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PendingCoachesScreen(navController: NavController, email: String = "admin@test.com") {
-    var refreshTrigger by remember { mutableStateOf(0) }
-    val pendingUsers = remember(refreshTrigger) {
-        MockRepository.getPendingUsers()
-    }
+    // Utilisation de snapshots réactifs pour éviter les crashs et assurer la mise à jour
+    val pendingUsers = MockRepository.registeredUsers.filter { it.status == com.gamecoach.model.UserStatus.PENDING }
 
     Scaffold(
         topBar = {
@@ -73,22 +71,20 @@ fun PendingCoachesScreen(navController: NavController, email: String = "admin@te
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(pendingUsers) { user ->
+                    items(pendingUsers, key = { it.email }) { user ->
                         PendingUserCard(
                             user = user,
                             onApprove = {
                                 MockRepository.approveUser(user.email)
-                                refreshTrigger++
                             },
                             onReject = {
                                 MockRepository.rejectUser(user.email)
-                                refreshTrigger++
                             },
                             onClick = {
                                 if (user.role == UserRole.COACH) {
-                                    val coachId = MockRepository.getCoachById(user.id)?.id ?: ""
-                                    if (coachId.isNotEmpty()) {
-                                        navController.navigate(Screen.CoachDetailAdmin.createRoute(coachId))
+                                    val coach = MockRepository.coaches.find { it.id == user.id || it.email == user.email }
+                                    if (coach != null) {
+                                        navController.navigate(Screen.CoachDetailAdmin.createRoute(coach.id))
                                     }
                                 }
                             }

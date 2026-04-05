@@ -6,7 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,6 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
+import com.gamecoach.model.UserRole
+import com.gamecoach.model.UserStatus
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.components.StatCard
 import com.gamecoach.ui.navigation.Screen
@@ -23,6 +26,23 @@ import com.gamecoach.ui.theme.*
 @Composable
 fun AdminHomeScreen(navController: NavController, email: String = "admin@test.com") {
     val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
+    // Observation des données réelles du repository
+    val usersCount by remember {
+        derivedStateOf { 
+            MockRepository.registeredUsers.count { it.role == UserRole.PLAYER } 
+        }
+    }
+    val coachesCount by remember {
+        derivedStateOf { 
+            MockRepository.registeredUsers.count { it.role == UserRole.COACH && it.status == UserStatus.APPROVED } 
+        }
+    }
+    val pendingCount by remember {
+        derivedStateOf { 
+            MockRepository.registeredUsers.count { it.status == UserStatus.PENDING } 
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -46,8 +66,12 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                 NavigationBarItem(
                     selected = false,
                     onClick = { navController.navigate(Screen.PendingCoaches.createRoute(email)) },
-                    icon = { Icon(Icons.Default.HourglassEmpty, contentDescription = "Coachs") },
-                    label = { Text("Coachs") }
+                    icon = { 
+                        BadgedBox(badge = { if (pendingCount > 0) Badge { Text(pendingCount.toString()) } }) {
+                            Icon(Icons.Default.HourglassEmpty, contentDescription = "Coachs")
+                        }
+                    },
+                    label = { Text("Attente") }
                 )
                 NavigationBarItem(
                     selected = false,
@@ -88,7 +112,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                 }
             }
 
-            // Stats
+            // Stats dynamiques
             Text("Statistiques", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Row(
@@ -97,14 +121,14 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
             ) {
                 StatCard(
                     icon = Icons.Default.People,
-                    value = "4",
-                    label = "Utilisateurs",
+                    value = usersCount.toString(),
+                    label = "Joueurs",
                     modifier = Modifier.weight(1f),
                     iconTint = PrimaryBlue
                 )
                 StatCard(
                     icon = Icons.Default.School,
-                    value = "5",
+                    value = coachesCount.toString(),
                     label = "Coachs actifs",
                     modifier = Modifier.weight(1f),
                     iconTint = Success
@@ -123,15 +147,20 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.HourglassEmpty,
-                        contentDescription = null,
-                        tint = Warning,
-                        modifier = Modifier.size(40.dp)
-                    )
+                    Box(contentAlignment = Alignment.TopEnd) {
+                        Icon(
+                            Icons.Default.HourglassEmpty,
+                            contentDescription = null,
+                            tint = Warning,
+                            modifier = Modifier.size(40.dp)
+                        )
+                        if (pendingCount > 0) {
+                            Badge { Text(pendingCount.toString()) }
+                        }
+                    }
                     Column {
-                        Text("Coachs en attente", fontWeight = FontWeight.Bold)
-                        Text("Valider les candidatures", fontSize = 14.sp, color = TextSecondary)
+                        Text("Inscriptions en attente", fontWeight = FontWeight.Bold)
+                        Text("$pendingCount demande(s) à traiter", fontSize = 14.sp, color = TextSecondary)
                     }
                 }
             }
@@ -149,7 +178,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Retour au Menu Principal")
+                Text("Se déconnecter")
             }
         }
     }

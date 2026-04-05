@@ -97,7 +97,8 @@ class AuthViewModel : ViewModel() {
                     )
                 } else null
 
-                MockRepository.registerUser(newUser, coachInfo)
+                // Correction : Ajout du paramètre password manquant
+                MockRepository.registerUser(newUser, password, coachInfo)
 
                 _authState.value = _authState.value.copy(
                     isLoading = false,

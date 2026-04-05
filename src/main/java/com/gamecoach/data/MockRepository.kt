@@ -9,6 +9,7 @@ object MockRepository {
         User(id = "admin_id", username = "Admin", email = "admin@amoa.inpt", role = UserRole.ADMIN, status = UserStatus.APPROVED, createdAt = "01/01/2024")
     )
 
+    // Map pour stocker les mots de passe lors de l'inscription
     private val userPasswords = mutableMapOf(
         "admin@amoa.inpt" to "amoainpt"
     )
@@ -21,9 +22,10 @@ object MockRepository {
     val sessions = mutableStateListOf<Session>()
     val messages = mutableStateListOf<Message>()
 
-    fun registerUser(user: User, coachInfo: Coach? = null) {
+    fun registerUser(user: User, password: String, coachInfo: Coach? = null) {
         if (registeredUsers.none { it.email.equals(user.email, ignoreCase = true) }) {
             registeredUsers.add(user.copy(status = UserStatus.PENDING, createdAt = "Aujourd'hui"))
+            userPasswords[user.email.lowercase().trim()] = password.trim()
             if (user.role == UserRole.COACH && coachInfo != null) {
                 coaches.add(coachInfo.copy(status = CoachStatus.PENDING, id = user.id, email = user.email))
             }
@@ -61,7 +63,12 @@ object MockRepository {
     fun getPendingUsers(): List<User> = registeredUsers.filter { it.status == UserStatus.PENDING }
     fun isUserApproved(email: String): Boolean = registeredUsers.find { it.email.equals(email, ignoreCase = true) }?.status == UserStatus.APPROVED
     fun isUserRegistered(email: String): Boolean = registeredUsers.any { it.email.equals(email, ignoreCase = true) }
-    fun verifyPassword(email: String, pass: String): Boolean = if (email.equals("admin@amoa.inpt", ignoreCase = true)) userPasswords[email] == pass else true 
+    
+    fun verifyPassword(email: String, pass: String): Boolean {
+        val storedPassword = userPasswords[email.lowercase().trim()]
+        return storedPassword != null && storedPassword == pass.trim()
+    }
+
     fun getUserByEmail(email: String): User? = registeredUsers.find { it.email.equals(email, ignoreCase = true) }
     fun getCoachById(id: String): Coach? = coaches.find { it.id == id }
 

@@ -264,6 +264,7 @@ fun RegisterScreen(navController: NavController) {
                                         email = email,
                                         role = selectedRole
                                     ),
+                                    password = password,
                                     coachInfo = coachInfo
                                 )
 

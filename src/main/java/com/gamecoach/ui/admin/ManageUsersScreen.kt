@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.User
 import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.GameCoachTopBar
@@ -28,38 +30,8 @@ fun ManageUsersScreen(navController: NavController, email: String = "admin@test.
     var selectedFilter by remember { mutableStateOf<UserRole?>(null) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val users = remember {
-        listOf(
-            User(
-                id = "1",
-                username = "joueur1",
-                email = "joueur1@test.com",
-                role = UserRole.PLAYER,
-                createdAt = "2024-01-15"
-            ),
-            User(
-                id = "2",
-                username = "coach_valorant",
-                email = "coach@test.com",
-                role = UserRole.COACH,
-                createdAt = "2024-01-10"
-            ),
-            User(
-                id = "3",
-                username = "admin",
-                email = "admin@test.com",
-                role = UserRole.ADMIN,
-                createdAt = "2024-01-01"
-            ),
-            User(
-                id = "4",
-                username = "Abderrafia",
-                email = "admin12@test.com",
-                role = UserRole.PLAYER,
-                createdAt = "2024-03-05"
-            )
-        )
-    }
+    // Utilisation des données réelles du MockRepository
+    val users = MockRepository.registeredUsers
 
     val filteredUsers = users.filter { user ->
         (selectedFilter == null || user.role == selectedFilter) &&
@@ -96,37 +68,37 @@ fun ManageUsersScreen(navController: NavController, email: String = "admin@test.
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Rechercher par nom ou email...") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    singleLine = true
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
 
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FilterChip(
                         selected = selectedFilter == null,
                         onClick = { selectedFilter = null },
-                        label = { Text("Tous les rôles") }
+                        label = { Text("Tous") },
+                        modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = selectedFilter == UserRole.PLAYER,
                         onClick = { selectedFilter = UserRole.PLAYER },
-                        label = { Text("Joueurs") }
+                        label = { Text("Joueurs") },
+                        modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = selectedFilter == UserRole.COACH,
                         onClick = { selectedFilter = UserRole.COACH },
-                        label = { Text("Coachs") }
-                    )
-                    FilterChip(
-                        selected = selectedFilter == UserRole.ADMIN,
-                        onClick = { selectedFilter = UserRole.ADMIN },
-                        label = { Text("Admins") }
+                        label = { Text("Coachs") },
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
 
             Text(
-                "${filteredUsers.size} utilisateur(s)",
+                "${filteredUsers.size} utilisateur(s) trouvé(s)",
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
@@ -134,13 +106,19 @@ fun ManageUsersScreen(navController: NavController, email: String = "admin@test.
 
             Spacer(Modifier.height(8.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(filteredUsers) { user ->
-                    UserCard(user = user)
+            if (filteredUsers.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Aucun utilisateur ne correspond à votre recherche", color = Color.Gray)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(filteredUsers, key = { it.email }) { user ->
+                        UserCard(user = user)
+                    }
                 }
             }
         }
