@@ -47,6 +47,20 @@ object MockRepository {
         }
     }
 
+    fun rejectUser(email: String) {
+        val index = registeredUsers.indexOfFirst { it.email.equals(email, ignoreCase = true) }
+        if (index != -1) {
+            val user = registeredUsers[index]
+            registeredUsers[index] = user.copy(status = UserStatus.REJECTED)
+            if (user.role == UserRole.COACH) {
+                val coachIndex = coaches.indexOfFirst { it.email.equals(email, ignoreCase = true) }
+                if (coachIndex != -1) {
+                    coaches[coachIndex] = coaches[coachIndex].copy(status = CoachStatus.REJECTED)
+                }
+            }
+        }
+    }
+
     fun getPendingUsers(): List<User> = registeredUsers.filter { it.status == UserStatus.PENDING }
 
     fun isUserApproved(email: String): Boolean = 

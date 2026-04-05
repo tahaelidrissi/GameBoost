@@ -16,7 +16,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4553c8f0-df94-4a0d-aff5-7a769c5e3d49" name="Changes" comment="" />
+    <list default="true" id="4553c8f0-df94-4a0d-aff5-7a769c5e3d49" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/data/MockRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/data/MockRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/PendingCoachesScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/PendingCoachesScreen.kt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
