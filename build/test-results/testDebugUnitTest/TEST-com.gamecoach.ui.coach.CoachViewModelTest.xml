@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.gamecoach.ui.coach.CoachViewModelTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-04-05T21:51:09.682Z" hostname="DESKTOP-R54TNBM" time="0.02">
+  <properties/>
+  <testcase name="etat initial est correct" classname="com.gamecoach.ui.coach.CoachViewModelTest" time="0.002"/>
+  <testcase name="acceptSession execute sans crasher l etat" classname="com.gamecoach.ui.coach.CoachViewModelTest" time="0.005"/>
+  <testcase name="loadData met isLoading a jour" classname="com.gamecoach.ui.coach.CoachViewModelTest" time="0.004"/>
+  <testcase name="rejectSession execute sans crasher l etat" classname="com.gamecoach.ui.coach.CoachViewModelTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -22,6 +22,7 @@ class AuthViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        com.gamecoach.data.MockRepository.resetForTesting()
         viewModel = AuthViewModel()
     }
 
@@ -41,7 +42,14 @@ class AuthViewModelTest {
 
     @Test
     fun `login reussit et met a jour user et isAuthenticated`() = runTest {
-        viewModel.login("test@test.com", "password")
+        // Préparer l'utilisateur dans le MockRepository
+        val email = "test@test.com"
+        val pass = "password"
+        val user = com.gamecoach.model.User(id = "1", username = "Test", email = email, role = UserRole.PLAYER)
+        com.gamecoach.data.MockRepository.registerUser(user, pass)
+        com.gamecoach.data.MockRepository.approveUser(email) // Doit être Approved pour login
+        
+        viewModel.login(email, pass)
         
         // Fait oser la coroutine jusqu'a la fin du faux delai reseau
         advanceUntilIdle()
@@ -50,7 +58,7 @@ class AuthViewModelTest {
         assertFalse(state.isLoading)
         assertTrue("L'utilisateur devrait etre authentifie", state.isAuthenticated)
         assertNotNull("L'utilisateur ne devrait pas etre null", state.user)
-        assertEquals("test@test.com", state.user?.email)
+        assertEquals(email, state.user?.email)
     }
 
     @Test
@@ -68,8 +76,15 @@ class AuthViewModelTest {
 
     @Test
     fun `logout reinitialise correctement l'etat`() = runTest {
+        // Préparer l'utilisateur
+        val email = "test@test.com"
+        val pass = "password"
+        val user = com.gamecoach.model.User(id = "1", username = "Test", email = email, role = UserRole.PLAYER)
+        com.gamecoach.data.MockRepository.registerUser(user, pass)
+        com.gamecoach.data.MockRepository.approveUser(email)
+        
         // Simule d'abord une connexion
-        viewModel.login("test@test.com", "password")
+        viewModel.login(email, pass)
         advanceUntilIdle()
         assertTrue(viewModel.authState.value.isAuthenticated)
 

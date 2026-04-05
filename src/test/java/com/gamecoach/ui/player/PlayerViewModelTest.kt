@@ -55,16 +55,10 @@ class PlayerViewModelTest {
     // ─────────────────────────────────────────────
 
     @Test
-    fun `loadCoaches modifie isLoading pendant lexecution et le remet a false`() = runTest {
+    fun `loadData modifie isLoading pendant lexecution et le remet a false`() = runTest {
         // Act
-        viewModel.loadCoaches()
+        viewModel.loadData("player@test.com")
         
-        // Assert : La coroutine est lancée mais pas finie (isLoading = true)
-        // Note: Selon l'implémentation de la coroutine, ca peut deja valoir true ici si pas suspendu, 
-        // ou nécessiter d'examiner exactement le flux d'états. On va simplement tester la fin d'exécution
-        // pour s'assurer que isLoading retourne bien à false après.
-        
-        // Fait oser la coroutine jusqu'à ce qu'il n'y ait plus rien en attente.
         advanceUntilIdle()
         
         // Le chargement est censé être résolu
@@ -76,8 +70,8 @@ class PlayerViewModelTest {
     // ─────────────────────────────────────────────
 
     @Test
-    fun `loadSessions modifie isLoading pendant lexecution et le remet a false`() = runTest {
-        viewModel.loadSessions()
+    fun `loadData (via loadSessions) modifie isLoading pendant lexecution et le remet a false`() = runTest {
+        viewModel.loadData("player@test.com")
         
         advanceUntilIdle()
         
@@ -90,7 +84,8 @@ class PlayerViewModelTest {
 
     @Test
     fun `requestSession ne laisse pas l application en chargement infini`() = runTest {
-        viewModel.requestSession(coachId = "123", duration = 2, date = "2024-03-10", time = "16:00")
+        val coach = com.gamecoach.model.Coach(id="123", username="Coach", email="c@t.com", game="V", hourlyRate=20.0)
+        viewModel.requestSession(playerEmail = "player@test.com", coach = coach, duration = 2, date = "2024-03-10", time = "16:00")
         
         advanceUntilIdle()
         

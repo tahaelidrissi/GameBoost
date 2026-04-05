@@ -157,6 +157,23 @@ object MockRepository {
     fun sendMessage(message: Message) { messages.add(message) }
     fun getMessagesForSession(sessionId: String): List<Message> = messages.filter { it.sessionId == sessionId }
     
+    fun getAllSessions(): List<Session> = sessions
+
+    fun canPaySession(sessionId: String): Boolean {
+        val session = getSessionById(sessionId) ?: return false
+        return session.status == SessionStatus.AWAITING_PAYMENT && !session.isPaid
+    }
+
+    fun resetForTesting() {
+        registeredUsers.clear()
+        registeredUsers.add(User(id = "admin_id", username = "Admin", email = "admin@amoa.inpt", role = UserRole.ADMIN, status = UserStatus.APPROVED, createdAt = "01/01/2024"))
+        userPasswords.clear()
+        userPasswords["admin@amoa.inpt"] = "amoainpt"
+        coaches.clear()
+        sessions.clear()
+        messages.clear()
+    }
+
     fun updateCoachRating(coachName: String, newRating: Int) {
         val index = coaches.indexOfFirst { it.username.equals(coachName, ignoreCase = true) }
         if (index != -1) {

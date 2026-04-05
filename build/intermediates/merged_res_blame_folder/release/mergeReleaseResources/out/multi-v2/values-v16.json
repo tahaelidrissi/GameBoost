@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.gamecoach-mergeReleaseResources-47:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\AdMin\\.gradle\\caches\\9.0.0\\transforms\\b874c7b69d96e8339967f4239dfa39fa\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}
