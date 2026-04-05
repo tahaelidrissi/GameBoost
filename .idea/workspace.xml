@@ -16,101 +16,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4553c8f0-df94-4a0d-aff5-7a769c5e3d49" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.0.0/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/TESTS_README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/androidTest/java/com/gamecoach/ui/player/CoachListScreenTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/AndroidManifest.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/MainActivity.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/data/MockRepository.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/model/Coach.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/model/Message.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/model/Review.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/model/Session.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/model/User.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/AdminHomeScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/AdminViewModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/CoachDetailAdminScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/ManageUsersScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/admin/PendingCoachesScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/auth/AuthViewModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/auth/LoginScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/auth/RegisterScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/auth/SplashScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachApplicationScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachChatListScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachChatScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachHomeScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachProfileScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachSessionDetailScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachSessionsScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/CoachViewModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/EditCoachProfileScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/RevenueScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/coach/ReviewsScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/components/CommonComponents.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/navigation/NavGraph.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/navigation/Screen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/ChatScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/CoachDetailScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/CoachListScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/PaymentScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/PlayerChatListScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/PlayerHomeScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/PlayerSessionsScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/PlayerViewModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/RequestSessionScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/ReviewCoachScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/player/SessionDetailScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/profile/EditProfileScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/profile/ProfileScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/profile/ProfileViewModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/profile/SettingsScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/theme/Color.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/theme/Theme.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/ui/theme/Type.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/util/Constants.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/java/com/gamecoach/util/Utils.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/drawable/ic_launcher_background.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/drawable/ic_launcher_foreground.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/drawable/splash_background.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/mipmap/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/values/colors.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/values/strings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/values/themes.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/xml/backup_rules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/xml/data_extraction_rules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main/res/xml/network_security_config.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/data/MockRepositoryTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/ui/admin/AdminViewModelTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/ui/auth/AuthViewModelTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/ui/coach/CoachViewModelTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/ui/player/PlayerViewModelTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/ui/profile/ProfileViewModelTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/test/java/com/gamecoach/util/UtilsTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/CoachDetailAdminScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/CoachDetailAdminScreen.kt" afterDir="false" />
-    </list>
+    <list default="true" id="4553c8f0-df94-4a0d-aff5-7a769c5e3d49" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -183,7 +89,6 @@
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "android.gradle.sync.needed": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",

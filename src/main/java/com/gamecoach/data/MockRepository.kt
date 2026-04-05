@@ -5,7 +5,6 @@ import com.gamecoach.model.*
 import java.util.UUID
 
 object MockRepository {
-    // Listes réactives pour que Compose détecte les changements immédiatement
     val registeredUsers = mutableStateListOf<User>(
         User(id = "admin_id", username = "Admin", email = "admin@amoa.inpt", role = UserRole.ADMIN, status = UserStatus.APPROVED, createdAt = "01/01/2024")
     )
@@ -22,8 +21,6 @@ object MockRepository {
     val sessions = mutableStateListOf<Session>()
     val messages = mutableStateListOf<Message>()
 
-    // --- Gestion des Utilisateurs ---
-    
     fun registerUser(user: User, coachInfo: Coach? = null) {
         if (registeredUsers.none { it.email.equals(user.email, ignoreCase = true) }) {
             registeredUsers.add(user.copy(status = UserStatus.PENDING, createdAt = "Aujourd'hui"))
@@ -62,19 +59,10 @@ object MockRepository {
     }
 
     fun getPendingUsers(): List<User> = registeredUsers.filter { it.status == UserStatus.PENDING }
-
-    fun isUserApproved(email: String): Boolean = 
-        registeredUsers.find { it.email.equals(email, ignoreCase = true) }?.status == UserStatus.APPROVED
-
+    fun isUserApproved(email: String): Boolean = registeredUsers.find { it.email.equals(email, ignoreCase = true) }?.status == UserStatus.APPROVED
     fun isUserRegistered(email: String): Boolean = registeredUsers.any { it.email.equals(email, ignoreCase = true) }
-    
-    fun verifyPassword(email: String, pass: String): Boolean {
-        if (email.equals("admin@amoa.inpt", ignoreCase = true)) return userPasswords[email] == pass
-        return true 
-    }
-
+    fun verifyPassword(email: String, pass: String): Boolean = if (email.equals("admin@amoa.inpt", ignoreCase = true)) userPasswords[email] == pass else true 
     fun getUserByEmail(email: String): User? = registeredUsers.find { it.email.equals(email, ignoreCase = true) }
-    
     fun getCoachById(id: String): Coach? = coaches.find { it.id == id }
 
     fun updateUsername(email: String, newUsername: String) {
@@ -82,8 +70,6 @@ object MockRepository {
         if (userIndex != -1) {
             val oldName = registeredUsers[userIndex].username
             registeredUsers[userIndex] = registeredUsers[userIndex].copy(username = newUsername)
-            
-            // Mise à jour réactive des sessions
             for (i in sessions.indices) {
                 val s = sessions[i]
                 if (s.playerName == oldName) sessions[i] = s.copy(playerName = newUsername)
@@ -91,8 +77,6 @@ object MockRepository {
             }
         }
     }
-
-    // --- Gestion des Sessions ---
 
     fun addSession(session: Session) { sessions.add(0, session) }
 
@@ -109,15 +93,17 @@ object MockRepository {
         val user = getUserByEmail(email) ?: return Pair(0, 0.0)
         val userSessions = getSessionsForUser(email)
         return if (user.role == UserRole.COACH) {
-            val completed = userSessions.filter { it.status == SessionStatus.COMPLETED }
-            Pair(completed.size, completed.sumOf { it.amount })
+            // Nombre de sessions terminées
+            val completedCount = userSessions.count { it.status == SessionStatus.COMPLETED }
+            // Revenus basés sur tout ce qui est payé (isPaid = true)
+            val totalRevenue = userSessions.filter { it.isPaid }.sumOf { it.amount }
+            Pair(completedCount, totalRevenue)
         } else {
             val completed = userSessions.filter { it.status == SessionStatus.COMPLETED }
-            Pair(completed.size, completed.sumOf { it.duration }.toDouble())
+            val totalHours = completed.sumOf { it.duration }.toDouble()
+            Pair(completed.size, totalHours)
         }
     }
-
-    fun getSessionById(id: String): Session? = sessions.find { it.id == id }
 
     fun updateSessionStatus(sessionId: String, status: SessionStatus) {
         val index = sessions.indexOfFirst { it.id == sessionId }
@@ -128,33 +114,20 @@ object MockRepository {
         updateSessionStatus(sessionId, SessionStatus.AWAITING_PAYMENT)
     }
 
+    fun markSessionAsPaid(sessionId: String) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index != -1) {
+            sessions[index] = sessions[index].copy(
+                status = SessionStatus.ACCEPTED, 
+                isPaid = true
+            )
+        }
+    }
+
     fun completeSession(sessionId: String) {
         updateSessionStatus(sessionId, SessionStatus.COMPLETED)
     }
 
-    fun markSessionAsPaid(sessionId: String) {
-        val index = sessions.indexOfFirst { it.id == sessionId }
-        if (index != -1) sessions[index] = sessions[index].copy(status = SessionStatus.ACCEPTED, isPaid = true)
-    }
-
-    // --- Gestion des Messages ---
-
     fun sendMessage(message: Message) { messages.add(message) }
     fun getMessagesForSession(sessionId: String): List<Message> = messages.filter { it.sessionId == sessionId }
-
-    // --- Gestion des Évaluations ---
-
-    fun updateCoachRating(coachName: String, newRating: Int) {
-        val index = coaches.indexOfFirst { it.username.equals(coachName, ignoreCase = true) }
-        if (index != -1) {
-            val coach = coaches[index]
-            val totalRating = coach.rating * coach.totalReviews
-            val newTotalReviews = coach.totalReviews + 1
-            val updatedRating = (totalRating + newRating) / newTotalReviews
-            coaches[index] = coach.copy(
-                rating = updatedRating,
-                totalReviews = newTotalReviews
-            )
-        }
-    }
 }
