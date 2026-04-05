@@ -2,13 +2,11 @@ package com.gamecoach.ui.coach
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,12 +23,12 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachHomeScreen(navController: NavController, email: String = "coach@test.com") {
-    // FIX: Utilisation du MockRepository pour le nom et les stats
-    val user = remember(email) { MockRepository.getUserByEmail(email) }
+    val user = remember(email, MockRepository.registeredUsers) { MockRepository.getUserByEmail(email) }
     val username = user?.username ?: email.substringBefore("@").replaceFirstChar { it.uppercase() }
     
-    val (sessionCount, totalHours) = remember(email) { MockRepository.getUserStats(email) }
-    val revenue = sessionCount * 35 // Simulation simple de revenu
+    val stats = remember(email, MockRepository.sessions) { MockRepository.getUserStats(email) }
+    val sessionCount = stats.first
+    val revenue = stats.second
 
     Scaffold(
         topBar = {
@@ -59,13 +57,13 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.CoachChatList.route) },
+                    onClick = { navController.navigate(Screen.CoachChatList.createRoute(email)) },
                     icon = { Icon(Icons.Default.Chat, contentDescription = "Messages") },
                     label = { Text("Messages") }
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.Revenue.route) },
+                    onClick = { navController.navigate(Screen.Revenue.createRoute(email)) },
                     icon = { Icon(Icons.Default.AttachMoney, contentDescription = "Revenus") },
                     label = { Text("Revenus") }
                 )
@@ -86,7 +84,6 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Bienvenue
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = PrimaryBlue)
@@ -95,21 +92,11 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                     modifier = Modifier.padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        "Bonjour, $username ! 👋",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        "Tableau de bord coach",
-                        fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.9f)
-                    )
+                    Text("Bonjour, $username ! 👋", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Tableau de bord coach", fontSize = 16.sp, color = Color.White.copy(alpha = 0.9f))
                 }
             }
 
-            // Stats DYNAMIQUES
             Text("Vos statistiques", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Row(
@@ -119,20 +106,19 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                 StatCard(
                     icon = Icons.Default.CalendarToday,
                     value = "$sessionCount",
-                    label = "Sessions totales",
+                    label = "Sessions terminées",
                     modifier = Modifier.weight(1f),
                     iconTint = PrimaryBlue
                 )
                 StatCard(
                     icon = Icons.Default.AttachMoney,
                     value = "${revenue}€",
-                    label = "Revenus",
+                    label = "Revenus totaux",
                     modifier = Modifier.weight(1f),
                     iconTint = Success
                 )
             }
 
-            // Actions rapides
             Text("Actions rapides", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Card(
@@ -144,15 +130,10 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.CalendarToday,
-                        contentDescription = null,
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(40.dp)
-                    )
+                    Icon(Icons.Default.CalendarToday, null, tint = PrimaryBlue, modifier = Modifier.size(40.dp))
                     Column {
                         Text("Gérer mes sessions", fontWeight = FontWeight.Bold)
-                        Text("Voir et gérer toutes vos sessions", fontSize = 14.sp, color = TextSecondary)
+                        Text("Voir vos demandes et séances", fontSize = 14.sp, color = TextSecondary)
                     }
                 }
             }
@@ -160,9 +141,7 @@ fun CoachHomeScreen(navController: NavController, email: String = "coach@test.co
             Spacer(modifier = Modifier.weight(1f))
             
             Button(
-                onClick = { navController.navigate(Screen.Login.route) {
-                    popUpTo(0)
-                } },
+                onClick = { navController.navigate(Screen.Login.route) { popUpTo(0) } },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {

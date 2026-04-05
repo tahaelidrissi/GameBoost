@@ -2,11 +2,15 @@ package com.gamecoach.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gamecoach.data.MockRepository
+import com.gamecoach.model.Coach
 import com.gamecoach.model.User
 import com.gamecoach.model.UserRole
+import com.gamecoach.model.UserStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 data class AuthState(
     val isLoading: Boolean = false,
@@ -24,16 +28,28 @@ class AuthViewModel : ViewModel() {
             _authState.value = _authState.value.copy(isLoading = true, error = null)
 
             try {
-                // TODO: Appel API de connexion
-                // Simulation
-                kotlinx.coroutines.delay(1000)
+                // Simulation d'un délai réseau
+                kotlinx.coroutines.delay(800)
 
-                val user = User(
-                    id = "1",
-                    username = "TestUser",
-                    email = email,
-                    role = UserRole.PLAYER
-                )
+                val user = MockRepository.getUserByEmail(email)
+                
+                if (user == null) {
+                    _authState.value = _authState.value.copy(isLoading = false, error = "Utilisateur non trouvé")
+                    return@launch
+                }
+
+                if (!MockRepository.verifyPassword(email, password)) {
+                    _authState.value = _authState.value.copy(isLoading = false, error = "Mot de passe incorrect")
+                    return@launch
+                }
+
+                if (user.status != UserStatus.APPROVED) {
+                    _authState.value = _authState.value.copy(
+                        isLoading = false, 
+                        error = "Votre compte est en attente de validation par l'administrateur"
+                    )
+                    return@launch
+                }
 
                 _authState.value = _authState.value.copy(
                     isLoading = false,
@@ -49,17 +65,44 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun register(username: String, email: String, password: String, role: UserRole) {
+    fun register(username: String, email: String, password: String, role: UserRole, game: String? = null, rank: String? = null) {
         viewModelScope.launch {
             _authState.value = _authState.value.copy(isLoading = true, error = null)
 
             try {
-                // TODO: Appel API d'inscription
-                // Simulation
-                kotlinx.coroutines.delay(1000)
+                kotlinx.coroutines.delay(800)
+                
+                if (MockRepository.isUserRegistered(email)) {
+                    _authState.value = _authState.value.copy(isLoading = false, error = "Cet email est déjà utilisé")
+                    return@launch
+                }
+
+                val userId = UUID.randomUUID().toString()
+                val newUser = User(
+                    id = userId,
+                    username = username,
+                    email = email,
+                    role = role,
+                    status = UserStatus.PENDING
+                )
+
+                val coachInfo = if (role == UserRole.COACH) {
+                    Coach(
+                        id = userId,
+                        username = username,
+                        email = email,
+                        game = game ?: "",
+                        rank = rank ?: "",
+                        hourlyRate = 25.0 // Tarif par défaut
+                    )
+                } else null
+
+                // Correction : Ajout du paramètre password manquant
+                MockRepository.registerUser(newUser, password, coachInfo)
 
                 _authState.value = _authState.value.copy(
-                    isLoading = false
+                    isLoading = false,
+                    error = "Inscription réussie ! En attente de validation par l'admin."
                 )
             } catch (e: Exception) {
                 _authState.value = _authState.value.copy(
@@ -71,9 +114,6 @@ class AuthViewModel : ViewModel() {
     }
 
     fun logout() {
-        viewModelScope.launch {
-            // TODO: Nettoyer le token
-            _authState.value = AuthState()
-        }
+        _authState.value = AuthState()
     }
 }

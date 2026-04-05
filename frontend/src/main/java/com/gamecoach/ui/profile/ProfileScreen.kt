@@ -5,8 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,8 +24,10 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, email: String = "joueur@test.com") {
-    // Récupération dynamique depuis le repository
-    val user = remember(email) {
+    // Récupération dynamique et réactive depuis le repository
+    // En ajoutant MockRepository.registeredUsers en tant que clé de remember, 
+    // l'UI se rafraîchira dès qu'un utilisateur est modifié dans la liste.
+    val user = remember(email, MockRepository.registeredUsers) {
         MockRepository.getUserByEmail(email) ?: User(
             id = "0",
             username = email.substringBefore("@"),
@@ -138,7 +139,7 @@ fun ProfileScreen(navController: NavController, email: String = "joueur@test.com
                 }
             }
 
-            // Action Modifier (FIX: Activation du bouton)
+            // Action Modifier
             Card(
                 onClick = { navController.navigate(Screen.EditProfile.createRoute(email)) },
                 modifier = Modifier.fillMaxWidth()
@@ -156,15 +157,17 @@ fun ProfileScreen(navController: NavController, email: String = "joueur@test.com
             Spacer(modifier = Modifier.weight(1f))
             
             Button(
-                onClick = { navController.navigate(Screen.Login.route) {
-                    popUpTo(0)
-                } },
+                onClick = { 
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0)
+                    } 
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Retour au Menu Principal")
+                Text("Se déconnecter")
             }
         }
     }

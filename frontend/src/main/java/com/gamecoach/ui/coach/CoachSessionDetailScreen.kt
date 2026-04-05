@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gamecoach.data.MockRepository
@@ -67,9 +68,6 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
 
             Spacer(Modifier.weight(1f))
 
-            // ACTIONS DU COACH
-            
-            // 1. Phase PENDING : Le coach valide ou refuse
             if (session.status == SessionStatus.PENDING) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -83,7 +81,7 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
                     ) {
-                        Text("Annuler/Refuser")
+                        Text("Refuser")
                     }
                     GameCoachButton(
                         text = "Accepter",
@@ -96,47 +94,45 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                 }
             }
 
-            // 2. Phase AWAITING_PAYMENT : Le coach peut encore annuler
             if (session.status == SessionStatus.AWAITING_PAYMENT) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Text(
+                        "En attente du paiement par le joueur...",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            if (session.status == SessionStatus.ACCEPTED) {
+                if (!session.coachFinished) {
+                    GameCoachButton(
+                        text = "Confirmer la fin de séance",
+                        onClick = { 
+                            MockRepository.markSessionAsFinishedByCoach(session.id)
+                            refreshTrigger++
+                        }
+                    )
+                } else {
+                    Surface(
+                        color = Success.copy(alpha = 0.1f),
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            "En attente du paiement par le joueur...",
+                            "Vous avez confirmé la fin. En attente du joueur...",
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyMedium
+                            color = Success,
+                            fontWeight = FontWeight.Bold
                         )
-                    }
-                    
-                    OutlinedButton(
-                        onClick = {
-                            MockRepository.updateSessionStatus(session.id, SessionStatus.CANCELLED)
-                            refreshTrigger++
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
-                    ) {
-                        Icon(Icons.Default.Cancel, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Annuler la séance")
                     }
                 }
             }
 
-            // 3. Phase ACCEPTED (Payé) : Le coach peut terminer
-            if (session.status == SessionStatus.ACCEPTED) {
-                GameCoachButton(
-                    text = "Terminer la session",
-                    onClick = { 
-                        MockRepository.completeSession(session.id)
-                        refreshTrigger++
-                    }
-                )
-            }
-
-            if (session.status != SessionStatus.CANCELLED) {
+            if (session.status != SessionStatus.CANCELLED && session.status != SessionStatus.REJECTED) {
                 OutlinedButton(
                     onClick = {
                         navController.navigate(Screen.CoachChat.createRoute(session.id, email))

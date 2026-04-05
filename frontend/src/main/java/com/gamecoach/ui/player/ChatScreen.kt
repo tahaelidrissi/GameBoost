@@ -25,13 +25,18 @@ import java.util.*
 @Composable
 fun ChatScreen(navController: NavController, sessionId: String = "", currentUserEmail: String = "") {
     var messageText by remember { mutableStateOf("") }
-    val session = remember(sessionId) { MockRepository.getSessionById(sessionId) }
-    val currentUser = remember(currentUserEmail) { MockRepository.getUserByEmail(currentUserEmail) }
     
-    // État des messages synchronisé avec le "backend"
-    var refreshTrigger by remember { mutableStateOf(0) }
-    val messages = remember(sessionId, refreshTrigger) {
-        MockRepository.getMessagesForSession(sessionId)
+    // Observation directe des données du repository pour la réactivité
+    val session = remember(sessionId) { MockRepository.getSessionById(sessionId) }
+    val currentUser = remember(currentUserEmail, MockRepository.registeredUsers) { 
+        MockRepository.getUserByEmail(currentUserEmail) 
+    }
+    
+    val messages by remember(sessionId) {
+        derivedStateOf { 
+            MockRepository.messages.filter { it.sessionId == sessionId }
+                .sortedBy { it.timestamp } // Optionnel: trier par temps
+        }
     }
 
     val listState = rememberLazyListState()
@@ -74,22 +79,21 @@ fun ChatScreen(navController: NavController, sessionId: String = "", currentUser
 
                     IconButton(
                         onClick = {
-                            if (messageText.isNotBlank() && currentUser != null && session != null) {
+                            if (messageText.isNotBlank() && currentUser != null) {
                                 val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
                                 val newMessage = Message(
                                     id = UUID.randomUUID().toString(),
                                     sessionId = sessionId,
                                     senderId = currentUser.id,
                                     senderName = currentUser.username,
-                                    content = messageText,
+                                    content = messageText.trim(),
                                     timestamp = sdf.format(Date())
                                 )
                                 MockRepository.sendMessage(newMessage)
                                 messageText = ""
-                                refreshTrigger++ // Force le rafraîchissement de la liste
                             }
                         },
-                        enabled = messageText.isNotBlank()
+                        enabled = messageText.isNotBlank() && currentUser != null
                     ) {
                         Icon(
                             Icons.Default.Send,
@@ -115,7 +119,7 @@ fun ChatScreen(navController: NavController, sessionId: String = "", currentUser
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                items(messages) { message ->
+                items(messages, key = { it.id }) { message ->
                     MessageBubble(
                         message = message,
                         isMe = message.senderId == currentUser?.id

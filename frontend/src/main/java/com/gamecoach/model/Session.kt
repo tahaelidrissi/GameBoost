@@ -13,7 +13,9 @@ data class Session(
     val amount: Double = 0.0,
     val status: SessionStatus = SessionStatus.PENDING,
     val createdAt: String = "",
-    val isPaid: Boolean = false
+    val isPaid: Boolean = false,
+    val coachFinished: Boolean = false,
+    val playerFinished: Boolean = false
 )
 
 enum class SessionStatus {
@@ -21,7 +23,7 @@ enum class SessionStatus {
     AWAITING_PAYMENT,   // Coach a validé, Joueur doit payer
     ACCEPTED,           // Payé, prête à être effectuée
     IN_PROGRESS,        // En cours
-    COMPLETED,          // Terminée par le coach
+    COMPLETED,          // Terminée par les deux (Joueur ET Coach)
     REJECTED,
     CANCELLED
 }

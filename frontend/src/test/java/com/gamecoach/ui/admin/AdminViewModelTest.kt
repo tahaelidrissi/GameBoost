@@ -35,34 +35,27 @@ class AdminViewModelTest {
         val state = viewModel.state.value
         assertFalse("isLoading devrait etre false", state.isLoading)
         assertTrue("la liste pendingCoaches devrait etre vide", state.pendingCoaches.isEmpty())
-        assertTrue("la liste users devrait etre vide", state.users.isEmpty())
+        assertTrue("la liste pendingUsers devrait etre vide", state.pendingUsers.isEmpty())
         assertNull(state.error)
     }
 
     @Test
-    fun `loadPendingCoaches termine sans erreur et reset isLoading`() = runTest {
-        viewModel.loadPendingCoaches()
-        advanceUntilIdle()
-        assertFalse(viewModel.state.value.isLoading)
-    }
-
-    @Test
-    fun `loadUsers termine sans erreur et reset isLoading`() = runTest {
-        viewModel.loadUsers()
+    fun `loadData termine sans erreur et reset isLoading`() = runTest {
+        viewModel.loadData()
         advanceUntilIdle()
         assertFalse(viewModel.state.value.isLoading)
     }
     
     @Test
-    fun `approveCoach termine sans crasher`() = runTest {
-        viewModel.approveCoach("id_coach")
+    fun `approveUser termine sans crasher`() = runTest {
+        viewModel.approveUser("test@email.com")
         advanceUntilIdle()
         assertFalse(viewModel.state.value.isLoading)
     }
 
     @Test
-    fun `rejectCoach termine sans crasher`() = runTest {
-        viewModel.rejectCoach("id_coach")
+    fun `rejectUser termine sans crasher`() = runTest {
+        viewModel.rejectUser("test@email.com")
         advanceUntilIdle()
         assertFalse(viewModel.state.value.isLoading)
     }

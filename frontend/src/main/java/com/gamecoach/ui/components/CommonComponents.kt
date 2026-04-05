@@ -124,7 +124,8 @@ fun GameCoachTextField(
     leadingIcon: ImageVector? = null,
     isPassword: Boolean = false,
     isError: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    keyboardOptions: KeyboardOptions = if (isPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default
 ) {
     Column(modifier = modifier) {
         OutlinedTextField(
@@ -135,7 +136,7 @@ fun GameCoachTextField(
                 { Icon(leadingIcon, contentDescription = null) }
             } else null,
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = if (isPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default,
+            keyboardOptions = keyboardOptions,
             modifier = Modifier.fillMaxWidth(),
             isError = isError,
             singleLine = true,

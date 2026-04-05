@@ -38,8 +38,8 @@ class CoachViewModelTest {
     }
 
     @Test
-    fun `loadSessions met isLoading a jour`() = runTest {
-        viewModel.loadSessions()
+    fun `loadData met isLoading a jour`() = runTest {
+        viewModel.loadData("coach@test.com")
         
         advanceUntilIdle()
         
@@ -49,14 +49,14 @@ class CoachViewModelTest {
 
     @Test
     fun `acceptSession execute sans crasher l etat`() = runTest {
-        viewModel.acceptSession("session-id-1")
+        viewModel.acceptSession("coach@test.com", "session-id-1")
         advanceUntilIdle()
         assertFalse(viewModel.state.value.isLoading)
     }
 
     @Test
     fun `rejectSession execute sans crasher l etat`() = runTest {
-        viewModel.rejectSession("session-id-1")
+        viewModel.rejectSession("coach@test.com", "session-id-1")
         advanceUntilIdle()
         assertFalse(viewModel.state.value.isLoading)
     }

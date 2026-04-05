@@ -120,6 +120,32 @@ fun SessionDetailScreen(navController: NavController, sessionId: String = "1", e
                 )
             }
 
+            // Phase ACCEPTED : Le joueur doit confirmer la fin
+            if (session.status == SessionStatus.ACCEPTED) {
+                if (!session.playerFinished) {
+                    GameCoachButton(
+                        text = "Confirmer la fin de séance",
+                        onClick = { 
+                            MockRepository.markSessionAsFinishedByPlayer(session.id)
+                            refreshTrigger++
+                        }
+                    )
+                } else {
+                    Surface(
+                        color = Success.copy(alpha = 0.1f),
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "Vous avez confirmé la fin. En attente du coach...",
+                            modifier = Modifier.padding(16.dp),
+                            color = Success,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
             if (session.status == SessionStatus.COMPLETED) {
                 GameCoachButton(
                     text = "Évaluer le coach",

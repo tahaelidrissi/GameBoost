@@ -5,8 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.Coach
 import com.gamecoach.model.CoachStatus
 import com.gamecoach.ui.components.GameCoachTopBar
@@ -24,22 +24,22 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachProfileScreen(navController: NavController, email: String = "coach@test.com") {
-    val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
-    val coach = remember(email) {
-        Coach(
-            id = "1",
-            username = username,
-            email = email,
-            game = "Valorant",
-            rank = "Radiant",
-            bio = "Coach professionnel avec 5 ans d'expérience",
-            hourlyRate = 35.0,
-            status = CoachStatus.APPROVED,
-            rating = 5.0,
-            totalReviews = 2,
-            totalSessions = 2,
-            totalEarnings = 70.0
-        )
+    // Récupération dynamique et réactive depuis le repository
+    val user = remember(email, MockRepository.registeredUsers) {
+        MockRepository.getUserByEmail(email)
+    }
+    
+    val coach = remember(user, MockRepository.coaches) {
+        user?.let { MockRepository.getCoachById(it.id) }
+    }
+
+    if (coach == null) {
+        Scaffold { padding ->
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Text("Profil coach introuvable")
+            }
+        }
+        return
     }
 
     Scaffold(
@@ -85,7 +85,7 @@ fun CoachProfileScreen(navController: NavController, email: String = "coach@test
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                username.take(1).uppercase(),
+                                coach.username.take(1).uppercase(),
                                 fontSize = 42.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PrimaryBlue
@@ -141,35 +141,33 @@ fun CoachProfileScreen(navController: NavController, email: String = "coach@test
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Biographie", fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(8.dp))
-                    Text(coach.bio, color = TextSecondary)
+                    Text(coach.bio.ifBlank { "Aucune biographie." }, color = TextSecondary)
                 }
             }
 
             // Note
-            if (coach.totalReviews > 0) {
-                Card(
-                    onClick = { navController.navigate(Screen.Reviews.route) }
+            Card(
+                onClick = { navController.navigate(Screen.Reviews.route) }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.Star, contentDescription = null, tint = Warning)
-                            Text("Note moyenne", fontWeight = FontWeight.Bold)
-                        }
-                        Text(
-                            "${coach.rating} (${coach.totalReviews} avis)",
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryBlue
-                        )
+                        Icon(Icons.Default.Star, contentDescription = null, tint = Warning)
+                        Text("Note moyenne", fontWeight = FontWeight.Bold)
                     }
+                    Text(
+                        "${coach.rating} (${coach.totalReviews} avis)",
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue
+                    )
                 }
             }
 
@@ -186,7 +184,7 @@ fun CoachProfileScreen(navController: NavController, email: String = "coach@test
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Retour au Menu Principal")
+                Text("Se déconnecter")
             }
         }
     }

@@ -6,7 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,6 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
+import com.gamecoach.model.UserRole
+import com.gamecoach.model.UserStatus
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.components.StatCard
 import com.gamecoach.ui.navigation.Screen
@@ -23,6 +26,26 @@ import com.gamecoach.ui.theme.*
 @Composable
 fun AdminHomeScreen(navController: NavController, email: String = "admin@test.com") {
     val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
+    // Observation des données réelles du repository
+    // Uniquement les joueurs approuvés sont comptés comme "Joueurs actifs"
+    val usersCount by remember {
+        derivedStateOf { 
+            MockRepository.registeredUsers.count { it.role == UserRole.PLAYER && it.status == UserStatus.APPROVED } 
+        }
+    }
+    // Uniquement les coachs approuvés sont comptés comme "Coachs actifs"
+    val coachesCount by remember {
+        derivedStateOf { 
+            MockRepository.registeredUsers.count { it.role == UserRole.COACH && it.status == UserStatus.APPROVED } 
+        }
+    }
+    // Toutes les inscriptions en attente (Joueurs et Coachs)
+    val pendingCount by remember {
+        derivedStateOf { 
+            MockRepository.registeredUsers.count { it.status == UserStatus.PENDING } 
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -45,9 +68,13 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.PendingCoaches.route) },
-                    icon = { Icon(Icons.Default.HourglassEmpty, contentDescription = "Coachs") },
-                    label = { Text("Coachs") }
+                    onClick = { navController.navigate(Screen.PendingCoaches.createRoute(email)) },
+                    icon = { 
+                        BadgedBox(badge = { if (pendingCount > 0) Badge { Text(pendingCount.toString()) } }) {
+                            Icon(Icons.Default.HourglassEmpty, contentDescription = "Coachs")
+                        }
+                    },
+                    label = { Text("Attente") }
                 )
                 NavigationBarItem(
                     selected = false,
@@ -88,7 +115,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                 }
             }
 
-            // Stats
+            // Stats dynamiques
             Text("Statistiques", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Row(
@@ -97,14 +124,14 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
             ) {
                 StatCard(
                     icon = Icons.Default.People,
-                    value = "4",
-                    label = "Utilisateurs",
+                    value = usersCount.toString(),
+                    label = "Joueurs actifs",
                     modifier = Modifier.weight(1f),
                     iconTint = PrimaryBlue
                 )
                 StatCard(
                     icon = Icons.Default.School,
-                    value = "5",
+                    value = coachesCount.toString(),
                     label = "Coachs actifs",
                     modifier = Modifier.weight(1f),
                     iconTint = Success
@@ -115,7 +142,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
             Text("Actions rapides", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Card(
-                onClick = { navController.navigate(Screen.PendingCoaches.route) },
+                onClick = { navController.navigate(Screen.PendingCoaches.createRoute(email)) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -123,15 +150,20 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.HourglassEmpty,
-                        contentDescription = null,
-                        tint = Warning,
-                        modifier = Modifier.size(40.dp)
-                    )
+                    Box(contentAlignment = Alignment.TopEnd) {
+                        Icon(
+                            Icons.Default.HourglassEmpty,
+                            contentDescription = null,
+                            tint = Warning,
+                            modifier = Modifier.size(40.dp)
+                        )
+                        if (pendingCount > 0) {
+                            Badge { Text(pendingCount.toString()) }
+                        }
+                    }
                     Column {
-                        Text("Coachs en attente", fontWeight = FontWeight.Bold)
-                        Text("Valider les candidatures", fontSize = 14.sp, color = TextSecondary)
+                        Text("Inscriptions en attente", fontWeight = FontWeight.Bold)
+                        Text("$pendingCount demande(s) à traiter", fontSize = 14.sp, color = TextSecondary)
                     }
                 }
             }
@@ -149,7 +181,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Retour au Menu Principal")
+                Text("Se déconnecter")
             }
         }
     }

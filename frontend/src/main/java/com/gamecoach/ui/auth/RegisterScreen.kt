@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,6 +44,7 @@ fun RegisterScreen(navController: NavController) {
     // Coach specific fields
     var coachGame by remember { mutableStateOf("") }
     var coachRank by remember { mutableStateOf("") }
+    var coachHourlyRate by remember { mutableStateOf("") }
     var isGameDropdownExpanded by remember { mutableStateOf(false) }
     
     var isLoading by remember { mutableStateOf(false) }
@@ -204,6 +207,18 @@ fun RegisterScreen(navController: NavController) {
                             label = "Votre Rang (ex: Radiant)",
                             leadingIcon = Icons.Default.EmojiEvents
                         )
+
+                        GameCoachTextField(
+                            value = coachHourlyRate,
+                            onValueChange = { 
+                                if (it.isEmpty() || it.all { char -> char.isDigit() || char == '.' }) {
+                                    coachHourlyRate = it 
+                                }
+                            },
+                            label = "Prix par heure ($)",
+                            leadingIcon = Icons.Default.Payments,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                        )
                     }
 
                     if (errorMessage.isNotEmpty()) {
@@ -221,8 +236,8 @@ fun RegisterScreen(navController: NavController) {
                         onClick = {
                             if (username.isBlank() || email.isBlank() || password.isBlank()) {
                                 errorMessage = "Veuillez remplir tous les champs"
-                            } else if (selectedRole == UserRole.COACH && (coachGame.isBlank() || coachRank.isBlank())) {
-                                errorMessage = "Veuillez préciser votre jeu et votre rang"
+                            } else if (selectedRole == UserRole.COACH && (coachGame.isBlank() || coachRank.isBlank() || coachHourlyRate.isBlank())) {
+                                errorMessage = "Veuillez préciser votre jeu, votre rang et votre tarif"
                             } else if (password.length < 8) {
                                 errorMessage = "Le mot de passe doit contenir au moins 8 caractères"
                             } else {
@@ -238,7 +253,7 @@ fun RegisterScreen(navController: NavController) {
                                         game = coachGame,
                                         rank = coachRank,
                                         status = CoachStatus.PENDING,
-                                        hourlyRate = 30.0
+                                        hourlyRate = coachHourlyRate.toDoubleOrNull() ?: 20.0
                                     )
                                 } else null
 
@@ -249,6 +264,7 @@ fun RegisterScreen(navController: NavController) {
                                         email = email,
                                         role = selectedRole
                                     ),
+                                    password = password,
                                     coachInfo = coachInfo
                                 )
 
