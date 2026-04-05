@@ -117,8 +117,12 @@ fun NavGraph(
             val email = backStackEntry.arguments?.getString("email") ?: ""
             ChatScreen(navController = navController, sessionId = sessionId, currentUserEmail = email)
         }
-        composable(Screen.PlayerChatList.route) {
-            PlayerChatListScreen(navController = navController)
+        composable(
+            route = Screen.PlayerChatList.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            PlayerChatListScreen(navController = navController, email = email)
         }
         composable(
             route = Screen.ReviewCoach.route,
@@ -180,8 +184,12 @@ fun NavGraph(
             val email = backStackEntry.arguments?.getString("email") ?: ""
             CoachChatScreen(navController = navController, sessionId = sessionId, email = email)
         }
-        composable(Screen.CoachChatList.route) {
-            CoachChatListScreen(navController = navController)
+        composable(
+            route = Screen.CoachChatList.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            CoachChatListScreen(navController = navController, email = email)
         }
         composable(Screen.Revenue.route) {
             RevenueScreen(navController = navController)
@@ -195,8 +203,12 @@ fun NavGraph(
             val email = backStackEntry.arguments?.getString("email") ?: ""
             AdminHomeScreen(navController = navController, email = email)
         }
-        composable(Screen.PendingCoaches.route) {
-            PendingCoachesScreen(navController = navController)
+        composable(
+            route = Screen.PendingCoaches.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            PendingCoachesScreen(navController = navController, email = email)
         }
         composable(
             route = Screen.CoachDetailAdmin.route,

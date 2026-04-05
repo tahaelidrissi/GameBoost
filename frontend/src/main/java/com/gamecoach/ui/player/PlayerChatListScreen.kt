@@ -8,8 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.ui.components.EmptyState
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.navigation.Screen
@@ -25,12 +25,22 @@ import com.gamecoach.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerChatListScreen(navController: NavController, email: String = "") {
-    // Données simulées
-    val chats = remember {
-        listOf(
-            ChatSummary("1", "ProValorant", "Valorant", "D'accord, à demain !", "10:30"),
-            ChatSummary("2", "LeagueGuru", "LoL", "Merci pour la session.", "Hier")
-        )
+    // Utilisation des vraies données du repository
+    val chats = remember(email, MockRepository.sessions, MockRepository.messages) {
+        val userSessions = MockRepository.getSessionsForUser(email)
+        userSessions.map { session ->
+            val lastMessage = MockRepository.messages
+                .filter { it.sessionId == session.id }
+                .lastOrNull()
+            
+            ChatSummary(
+                id = session.id,
+                coachName = session.coachName,
+                game = session.game,
+                lastMessage = lastMessage?.content ?: "Aucun message",
+                time = lastMessage?.timestamp ?: ""
+            )
+        }.filter { it.time.isNotEmpty() || it.lastMessage != "Aucun message" }
     }
 
     Scaffold(

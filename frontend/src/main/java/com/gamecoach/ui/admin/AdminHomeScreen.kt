@@ -45,7 +45,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate(Screen.PendingCoaches.route) },
+                    onClick = { navController.navigate(Screen.PendingCoaches.createRoute(email)) },
                     icon = { Icon(Icons.Default.HourglassEmpty, contentDescription = "Coachs") },
                     label = { Text("Coachs") }
                 )
@@ -115,7 +115,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
             Text("Actions rapides", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
 
             Card(
-                onClick = { navController.navigate(Screen.PendingCoaches.route) },
+                onClick = { navController.navigate(Screen.PendingCoaches.createRoute(email)) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(

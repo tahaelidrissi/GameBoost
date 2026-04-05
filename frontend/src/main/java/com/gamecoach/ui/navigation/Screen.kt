@@ -35,7 +35,9 @@ sealed class Screen(val route: String) {
     object Chat : Screen("chat/{sessionId}?email={email}") {
         fun createRoute(sessionId: String, email: String) = "chat/$sessionId?email=$email"
     }
-    object PlayerChatList : Screen("player_chat_list")
+    object PlayerChatList : Screen("player_chat_list?email={email}") {
+        fun createRoute(email: String) = "player_chat_list?email=$email"
+    }
     object ReviewCoach : Screen("review_coach/{sessionId}?email={email}") {
         fun createRoute(sessionId: String, email: String) = "review_coach/$sessionId?email=$email"
     }
@@ -61,7 +63,9 @@ sealed class Screen(val route: String) {
     object CoachChat : Screen("coach_chat/{sessionId}?email={email}") {
         fun createRoute(sessionId: String, email: String) = "coach_chat/$sessionId?email=$email"
     }
-    object CoachChatList : Screen("coach_chat_list")
+    object CoachChatList : Screen("coach_chat_list?email={email}") {
+        fun createRoute(email: String) = "coach_chat_list?email=$email"
+    }
     object Revenue : Screen("revenue")
     object Reviews : Screen("reviews")
 
@@ -69,7 +73,9 @@ sealed class Screen(val route: String) {
     object AdminHome : Screen("admin_home?email={email}") {
         fun createRoute(email: String) = "admin_home?email=$email"
     }
-    object PendingCoaches : Screen("pending_coaches")
+    object PendingCoaches : Screen("pending_coaches?email={email}") {
+        fun createRoute(email: String) = "pending_coaches?email=$email"
+    }
     object CoachDetailAdmin : Screen("coach_detail_admin/{coachId}") {
         fun createRoute(coachId: String) = "coach_detail_admin/$coachId"
     }
