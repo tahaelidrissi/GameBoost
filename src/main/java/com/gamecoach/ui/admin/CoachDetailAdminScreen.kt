@@ -1,6 +1,5 @@
 package com.gamecoach.ui.admin
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -13,37 +12,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.gamecoach.model.Coach
+import com.gamecoach.data.MockRepository
 import com.gamecoach.model.CoachStatus
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
-import com.gamecoach.ui.player.InfoRow
+import com.gamecoach.ui.components.InfoRow
 import com.gamecoach.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoachDetailAdminScreen(navController: NavController) {
+fun CoachDetailAdminScreen(navController: NavController, coachId: String = "") {
     var showApproveDialog by remember { mutableStateOf(false) }
     var showRejectDialog by remember { mutableStateOf(false) }
 
-    val coach = remember {
-        Coach(
-            id = "1",
-            username = "ProValorant",
-            email = "coach@test.com",
-            game = "Valorant",
-            rank = "Radiant",
-            bio = "Coach professionnel avec 5 ans d'expérience",
-            hourlyRate = 35.0,
-            status = CoachStatus.PENDING,
-            proofImageBase64 = null
-        )
+    // Récupération dynamique
+    val coach = remember(coachId) {
+        MockRepository.getCoachById(coachId)
+    }
+
+    if (coach == null) {
+        Scaffold { padding -> 
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { 
+                Text("Coach non trouvé") 
+            } 
+        }
+        return
     }
 
     Scaffold(
@@ -96,11 +93,11 @@ fun CoachDetailAdminScreen(navController: NavController) {
                     )
 
                     Surface(
-                        color = Warning.copy(alpha = 0.2f),
+                        color = if (coach.status == CoachStatus.PENDING) Warning.copy(alpha = 0.2f) else Success.copy(alpha = 0.2f),
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
-                            "⏳ Nouvel inscrit",
+                            if (coach.status == CoachStatus.PENDING) "⏳ En attente de validation" else "✅ Approuvé",
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                             color = Color.White,
                             fontWeight = FontWeight.Bold
@@ -109,7 +106,7 @@ fun CoachDetailAdminScreen(navController: NavController) {
                 }
             }
 
-            // Informations de base uniquement pour un nouvel inscrit
+            // Informations
             Card {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -118,34 +115,48 @@ fun CoachDetailAdminScreen(navController: NavController) {
                     Text("Informations", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Divider()
                     InfoRow(Icons.Default.Email, "Email", coach.email)
-                    InfoRow(Icons.Default.SportsEsports, "Jeu souhaité", coach.game)
+                    InfoRow(Icons.Default.SportsEsports, "Jeu", coach.game)
+                    InfoRow(Icons.Default.EmojiEvents, "Rang", coach.rank)
+                    InfoRow(Icons.Default.AttachMoney, "Tarif horaire", "${coach.hourlyRate}€/h")
+                }
+            }
+
+            // Bio
+            Card {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("Biographie", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Divider()
+                    Text(coach.bio, color = TextSecondary)
                 }
             }
 
             Spacer(Modifier.height(8.dp))
 
-            // Actions
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { showRejectDialog = true },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Error
-                    )
+            // Actions (Affichées seulement si PENDING)
+            if (coach.status == CoachStatus.PENDING) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Rejeter")
-                }
+                    OutlinedButton(
+                        onClick = { showRejectDialog = true },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Rejeter")
+                    }
 
-                GameCoachButton(
-                    text = "Approuver",
-                    onClick = { showApproveDialog = true },
-                    modifier = Modifier.weight(1f)
-                )
+                    GameCoachButton(
+                        text = "Approuver",
+                        onClick = { showApproveDialog = true },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }
@@ -159,7 +170,8 @@ fun CoachDetailAdminScreen(navController: NavController) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // TODO: Approuver
+                        // ACTION RÉELLE : On approuve l'utilisateur par son email
+                        MockRepository.approveUser(coach.email)
                         showApproveDialog = false
                         navController.navigateUp()
                     }
@@ -169,30 +181,6 @@ fun CoachDetailAdminScreen(navController: NavController) {
             },
             dismissButton = {
                 TextButton(onClick = { showApproveDialog = false }) {
-                    Text("Annuler")
-                }
-            }
-        )
-    }
-
-    if (showRejectDialog) {
-        AlertDialog(
-            onDismissRequest = { showRejectDialog = false },
-            title = { Text("Rejeter le coach") },
-            text = { Text("Voulez-vous rejeter la candidature de ${coach.username} ?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        // TODO: Rejeter
-                        showRejectDialog = false
-                        navController.navigateUp()
-                    }
-                ) {
-                    Text("Rejeter", color = Error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showRejectDialog = false }) {
                     Text("Annuler")
                 }
             }

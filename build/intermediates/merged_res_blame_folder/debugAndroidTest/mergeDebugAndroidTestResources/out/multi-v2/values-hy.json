@@ -4,7 +4,7 @@
             "outputFile": "com.gamecoach.test-mergeDebugAndroidTestResources-32:/values-hy/values-hy.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Lenovo\\.gradle\\caches\\8.8\\transforms\\b85d54794468d5e0cc4b3ca133a5d595\\transformed\\jetified-ui-release\\res\\values-hy\\values-hy.xml",
+                    "source": "C:\\Users\\Lenovo\\.gradle\\caches\\9.0.0\\transforms\\d1988ed23833f8f8e3301d8c6cb108c1\\transformed\\jetified-ui-release\\res\\values-hy\\values-hy.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Lenovo\\.gradle\\caches\\8.8\\transforms\\d762abd263147ae5e21254ca39d37264\\transformed\\core-1.12.0\\res\\values-hy\\values-hy.xml",
+                    "source": "C:\\Users\\Lenovo\\.gradle\\caches\\9.0.0\\transforms\\b874c7b69d96e8339967f4239dfa39fa\\transformed\\core-1.12.0\\res\\values-hy\\values-hy.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
