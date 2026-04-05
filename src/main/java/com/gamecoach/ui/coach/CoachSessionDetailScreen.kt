@@ -67,9 +67,6 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
 
             Spacer(Modifier.weight(1f))
 
-            // ACTIONS DU COACH
-            
-            // 1. Phase PENDING : Le coach valide ou refuse
             if (session.status == SessionStatus.PENDING) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -83,7 +80,7 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
                     ) {
-                        Text("Annuler/Refuser")
+                        Text("Refuser")
                     }
                     GameCoachButton(
                         text = "Accepter",
@@ -96,36 +93,19 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                 }
             }
 
-            // 2. Phase AWAITING_PAYMENT : Le coach peut encore annuler
             if (session.status == SessionStatus.AWAITING_PAYMENT) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Text(
-                            "En attente du paiement par le joueur...",
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    
-                    OutlinedButton(
-                        onClick = {
-                            MockRepository.updateSessionStatus(session.id, SessionStatus.CANCELLED)
-                            refreshTrigger++
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Error)
-                    ) {
-                        Icon(Icons.Default.Cancel, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Annuler la séance")
-                    }
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Text(
+                        "En attente du paiement par le joueur...",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
-            // 3. Phase ACCEPTED (Payé) : Le coach peut terminer
             if (session.status == SessionStatus.ACCEPTED) {
                 GameCoachButton(
                     text = "Terminer la session",
@@ -136,7 +116,7 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
                 )
             }
 
-            if (session.status != SessionStatus.CANCELLED) {
+            if (session.status != SessionStatus.CANCELLED && session.status != SessionStatus.REJECTED) {
                 OutlinedButton(
                     onClick = {
                         navController.navigate(Screen.CoachChat.createRoute(session.id, email))

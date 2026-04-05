@@ -93,9 +93,7 @@ object MockRepository {
         val user = getUserByEmail(email) ?: return Pair(0, 0.0)
         val userSessions = getSessionsForUser(email)
         return if (user.role == UserRole.COACH) {
-            // Nombre de sessions terminées
             val completedCount = userSessions.count { it.status == SessionStatus.COMPLETED }
-            // Revenus basés sur tout ce qui est payé (isPaid = true)
             val totalRevenue = userSessions.filter { it.isPaid }.sumOf { it.amount }
             Pair(completedCount, totalRevenue)
         } else {
@@ -104,6 +102,8 @@ object MockRepository {
             Pair(completed.size, totalHours)
         }
     }
+
+    fun getSessionById(id: String): Session? = sessions.find { it.id == id }
 
     fun updateSessionStatus(sessionId: String, status: SessionStatus) {
         val index = sessions.indexOfFirst { it.id == sessionId }
@@ -130,4 +130,18 @@ object MockRepository {
 
     fun sendMessage(message: Message) { messages.add(message) }
     fun getMessagesForSession(sessionId: String): List<Message> = messages.filter { it.sessionId == sessionId }
+    
+    fun updateCoachRating(coachName: String, newRating: Int) {
+        val index = coaches.indexOfFirst { it.username.equals(coachName, ignoreCase = true) }
+        if (index != -1) {
+            val coach = coaches[index]
+            val totalRating = coach.rating * coach.totalReviews
+            val newTotalReviews = coach.totalReviews + 1
+            val updatedRating = (totalRating + newRating) / newTotalReviews
+            coaches[index] = coach.copy(
+                rating = updatedRating,
+                totalReviews = newTotalReviews
+            )
+        }
+    }
 }
