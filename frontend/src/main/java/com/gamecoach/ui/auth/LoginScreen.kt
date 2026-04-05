@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gamecoach.data.MockRepository
+import com.gamecoach.model.UserRole
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTextField
 import com.gamecoach.ui.navigation.Screen
@@ -128,9 +129,10 @@ fun LoginScreen(navController: NavController) {
                                 errorMessage = "Votre compte est en attente de validation par l'administrateur."
                             } else {
                                 isLoading = true
-                                val targetRoute = when {
-                                    email.contains("admin", ignoreCase = true) -> Screen.AdminHome.createRoute(email)
-                                    email.contains("coach", ignoreCase = true) -> Screen.CoachHome.createRoute(email)
+                                val user = MockRepository.getUserByEmail(email)
+                                val targetRoute = when (user?.role) {
+                                    UserRole.ADMIN -> Screen.AdminHome.createRoute(email)
+                                    UserRole.COACH -> Screen.CoachHome.createRoute(email)
                                     else -> Screen.PlayerHome.createRoute(email)
                                 }
                                 navController.navigate(targetRoute) {
