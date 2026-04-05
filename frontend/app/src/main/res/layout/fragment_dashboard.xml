@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/welcome_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bienvenue!"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/role_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rôle: "
+        android:textSize="16sp"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/view_coaches_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Voir les Coachs"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/view_sessions_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Mes Sessions"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Déconnexion"
+        android:backgroundTint="@android:color/holo_red_light" />
+
+</LinearLayout>

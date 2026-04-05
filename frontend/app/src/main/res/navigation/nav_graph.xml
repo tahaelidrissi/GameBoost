@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.gameboost.frontend.ui.screens.LoginFragment"
+        android:label="Connexion">
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_login_to_dashboard"
+            app:destination="@id/dashboardFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.gameboost.frontend.ui.screens.RegisterFragment"
+        android:label="Inscription">
+        <action
+            android:id="@+id/action_register_to_dashboard"
+            app:destination="@id/dashboardFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_register_to_coach_profile"
+            app:destination="@id/coachProfileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.gameboost.frontend.ui.screens.DashboardFragment"
+        android:label="Tableau de bord">
+        <action
+            android:id="@+id/action_dashboard_to_coach_list"
+            app:destination="@id/coachListFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_session_list"
+            app:destination="@id/sessionListFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/dashboardFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/coachListFragment"
+        android:name="com.gameboost.frontend.ui.screens.CoachListFragment"
+        android:label="Coachs" />
+
+    <fragment
+        android:id="@+id/sessionListFragment"
+        android:name="com.gameboost.frontend.ui.screens.SessionListFragment"
+        android:label="Sessions" />
+
+    <fragment
+        android:id="@+id/coachProfileFragment"
+        android:name="com.gameboost.frontend.ui.screens.CoachProfileFragment"
+        android:label="Profil Coach" />
+
+</navigation>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GameBoost - Inscription"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="32dp" />
+
+    <EditText
+        android:id="@+id/email_input"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Email"
+        android:inputType="emailAddress"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/username_input"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Pseudo (3-20 caractères)"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/password_input"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Mot de passe (min 8 chars, 1 majuscule, 1 chiffre)"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/player_radio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Joueur" />
+
+        <RadioButton
+            android:id="@+id/coach_radio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Coach" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="S'inscrire"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/login_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Déjà inscrit? Se connecter"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_blue_light"
+        android:padding="16dp"
+        android:textSize="14sp" />
+
+</LinearLayout>

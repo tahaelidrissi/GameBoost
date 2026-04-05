@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GameBoost</string>
+    <string name="login_title">Connexion</string>
+    <string name="register_title">Inscription</string>
+    <string name="dashboard_title">Tableau de bord</string>
+    <string name="coaches_title">Coachs</string>
+    <string name="sessions_title">Sessions</string>
+</resources>
