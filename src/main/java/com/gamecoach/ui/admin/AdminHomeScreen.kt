@@ -28,16 +28,19 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
     val username = email.substringBefore("@").replaceFirstChar { it.uppercase() }
 
     // Observation des données réelles du repository
+    // Uniquement les joueurs approuvés sont comptés comme "Joueurs actifs"
     val usersCount by remember {
         derivedStateOf { 
-            MockRepository.registeredUsers.count { it.role == UserRole.PLAYER } 
+            MockRepository.registeredUsers.count { it.role == UserRole.PLAYER && it.status == UserStatus.APPROVED } 
         }
     }
+    // Uniquement les coachs approuvés sont comptés comme "Coachs actifs"
     val coachesCount by remember {
         derivedStateOf { 
             MockRepository.registeredUsers.count { it.role == UserRole.COACH && it.status == UserStatus.APPROVED } 
         }
     }
+    // Toutes les inscriptions en attente (Joueurs et Coachs)
     val pendingCount by remember {
         derivedStateOf { 
             MockRepository.registeredUsers.count { it.status == UserStatus.PENDING } 
@@ -122,7 +125,7 @@ fun AdminHomeScreen(navController: NavController, email: String = "admin@test.co
                 StatCard(
                     icon = Icons.Default.People,
                     value = usersCount.toString(),
-                    label = "Joueurs",
+                    label = "Joueurs actifs",
                     modifier = Modifier.weight(1f),
                     iconTint = PrimaryBlue
                 )

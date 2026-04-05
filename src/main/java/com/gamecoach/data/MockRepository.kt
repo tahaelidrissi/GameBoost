@@ -9,15 +9,11 @@ object MockRepository {
         User(id = "admin_id", username = "Admin", email = "admin@amoa.inpt", role = UserRole.ADMIN, status = UserStatus.APPROVED, createdAt = "01/01/2024")
     )
 
-    // Map pour stocker les mots de passe lors de l'inscription
     private val userPasswords = mutableMapOf(
         "admin@amoa.inpt" to "amoainpt"
     )
 
-    val coaches = mutableStateListOf<Coach>(
-        Coach(id = "1", username = "ProBoost", game = "Valorant", rank = "Radiant", hourlyRate = 35.0, rating = 4.8, totalReviews = 42, status = CoachStatus.APPROVED),
-        Coach(id = "2", username = "LeagueExpert", game = "League of Legends", rank = "Challenger", hourlyRate = 40.0, rating = 4.9, totalReviews = 87, status = CoachStatus.APPROVED)
-    )
+    val coaches = mutableStateListOf<Coach>()
 
     val sessions = mutableStateListOf<Session>()
     val messages = mutableStateListOf<Message>()
@@ -131,8 +127,31 @@ object MockRepository {
         }
     }
 
-    fun completeSession(sessionId: String) {
-        updateSessionStatus(sessionId, SessionStatus.COMPLETED)
+    fun markSessionAsFinishedByCoach(sessionId: String) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index != -1) {
+            val session = sessions[index]
+            val updated = session.copy(coachFinished = true)
+            sessions[index] = updated
+            checkIfSessionCompleted(index)
+        }
+    }
+
+    fun markSessionAsFinishedByPlayer(sessionId: String) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index != -1) {
+            val session = sessions[index]
+            val updated = session.copy(playerFinished = true)
+            sessions[index] = updated
+            checkIfSessionCompleted(index)
+        }
+    }
+
+    private fun checkIfSessionCompleted(index: Int) {
+        val session = sessions[index]
+        if (session.coachFinished && session.playerFinished) {
+            sessions[index] = session.copy(status = SessionStatus.COMPLETED)
+        }
     }
 
     fun sendMessage(message: Message) { messages.add(message) }

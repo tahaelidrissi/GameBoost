@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gamecoach.data.MockRepository
@@ -107,13 +108,28 @@ fun CoachSessionDetailScreen(navController: NavController, sessionId: String = "
             }
 
             if (session.status == SessionStatus.ACCEPTED) {
-                GameCoachButton(
-                    text = "Terminer la session",
-                    onClick = { 
-                        MockRepository.completeSession(session.id)
-                        refreshTrigger++
+                if (!session.coachFinished) {
+                    GameCoachButton(
+                        text = "Confirmer la fin de séance",
+                        onClick = { 
+                            MockRepository.markSessionAsFinishedByCoach(session.id)
+                            refreshTrigger++
+                        }
+                    )
+                } else {
+                    Surface(
+                        color = Success.copy(alpha = 0.1f),
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "Vous avez confirmé la fin. En attente du joueur...",
+                            modifier = Modifier.padding(16.dp),
+                            color = Success,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                )
+                }
             }
 
             if (session.status != SessionStatus.CANCELLED && session.status != SessionStatus.REJECTED) {

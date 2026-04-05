@@ -56,7 +56,8 @@ class CoachViewModel : ViewModel() {
 
     fun completeSession(coachEmail: String, sessionId: String) {
         viewModelScope.launch {
-            MockRepository.completeSession(sessionId)
+            // Mise à jour pour utiliser la nouvelle logique de fin de séance par les deux parties
+            MockRepository.markSessionAsFinishedByCoach(sessionId)
             loadData(coachEmail)
         }
     }

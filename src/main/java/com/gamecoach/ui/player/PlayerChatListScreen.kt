@@ -37,10 +37,10 @@ fun PlayerChatListScreen(navController: NavController, email: String = "") {
                 id = session.id,
                 coachName = session.coachName,
                 game = session.game,
-                lastMessage = lastMessage?.content ?: "Aucun message",
+                lastMessage = lastMessage?.content ?: "Prêt pour votre séance ?",
                 time = lastMessage?.timestamp ?: ""
             )
-        }.filter { it.time.isNotEmpty() || it.lastMessage != "Aucun message" }
+        }
     }
 
     Scaffold(

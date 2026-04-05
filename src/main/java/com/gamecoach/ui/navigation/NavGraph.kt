@@ -75,7 +75,7 @@ fun NavGraph(
         ) { backStackEntry ->
             val coachId = backStackEntry.arguments?.getString("coachId") ?: ""
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            CoachDetailScreen(navController = navController, email = email)
+            CoachDetailScreen(navController = navController, coachId = coachId, email = email)
         }
         composable(
             route = Screen.RequestSession.route,
@@ -144,7 +144,7 @@ fun NavGraph(
         ) { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            PaymentScreen(navController = navController)
+            PaymentScreen(navController = navController, sessionId = sessionId, email = email)
         }
 
         // Coach
@@ -182,7 +182,7 @@ fun NavGraph(
         ) { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            CoachChatScreen(navController = navController, sessionId = sessionId, email = email)
+            ChatScreen(navController = navController, sessionId = sessionId, currentUserEmail = email)
         }
         composable(
             route = Screen.CoachChatList.route,
@@ -191,10 +191,46 @@ fun NavGraph(
             val email = backStackEntry.arguments?.getString("email") ?: ""
             CoachChatListScreen(navController = navController, email = email)
         }
-        composable(Screen.Revenue.route) {
-            RevenueScreen(navController = navController)
+        composable(
+            route = Screen.Revenue.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            RevenueScreen(navController = navController, email = email)
+        }
+        composable(
+            route = Screen.Reviews.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            ReviewsScreen(navController = navController)
+        }
+        composable(
+            route = Screen.EditCoachProfile.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            EditCoachProfileScreen(navController = navController)
+        }
+        composable(
+            route = Screen.CoachProfile.route,
+            arguments = listOf(navArgument("email") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            CoachProfileScreen(navController = navController, email = email)
         }
 
+        composable(Screen.EditCoachProfile.route) {
+            EditCoachProfileScreen(navController = navController)
+        }
+
+        composable(Screen.CoachApplication.route) {
+            CoachApplicationScreen(navController = navController)
+        }
+
+        composable(Screen.Reviews.route) {
+            ReviewsScreen(navController = navController)
+        }
         // Admin
         composable(
             route = Screen.AdminHome.route,
@@ -209,6 +245,11 @@ fun NavGraph(
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             PendingCoachesScreen(navController = navController, email = email)
+        }
+        composable(
+            route = Screen.ManageUsers.route
+        ) {
+            ManageUsersScreen(navController = navController)
         }
         composable(
             route = Screen.CoachDetailAdmin.route,

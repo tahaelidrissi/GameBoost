@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.gamecoach.data.MockRepository
 import com.gamecoach.ui.components.GameCoachButton
 import com.gamecoach.ui.components.GameCoachTopBar
 import com.gamecoach.ui.navigation.Screen
@@ -24,9 +25,11 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentScreen(navController: NavController) {
+fun PaymentScreen(navController: NavController, sessionId: String = "", email: String = "") {
     var isProcessing by remember { mutableStateOf(false) }
     var isPaid by remember { mutableStateOf(false) }
+    
+    val session = remember(sessionId) { MockRepository.getSessionById(sessionId) }
 
     Scaffold(
         topBar = {
@@ -34,7 +37,7 @@ fun PaymentScreen(navController: NavController) {
                 title = if (isPaid) "Paiement Réussi" else "Paiement",
                 onBackClick = { 
                     if (isPaid) {
-                        navController.navigate(Screen.PlayerHome.route) {
+                        navController.navigate(Screen.PlayerHome.createRoute(email)) {
                             popUpTo(Screen.PlayerHome.route) { inclusive = true }
                         }
                     } else {
@@ -49,7 +52,9 @@ fun PaymentScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if (!isPaid) {
+            if (session == null) {
+                Text("Session introuvable", modifier = Modifier.align(Alignment.Center))
+            } else if (!isPaid) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -76,9 +81,9 @@ fun PaymentScreen(navController: NavController) {
 
                             Divider(color = Color.White.copy(alpha = 0.3f))
 
-                            PaymentRow("Session de coaching", "35.00€")
-                            PaymentRow("Durée", "1 heure")
-                            PaymentRow("Coach", "ProValorant")
+                            PaymentRow("Session de coaching", session.game)
+                            PaymentRow("Durée", "${session.duration} heure(s)")
+                            PaymentRow("Coach", session.coachName)
 
                             Divider(color = Color.White.copy(alpha = 0.3f))
 
@@ -93,7 +98,7 @@ fun PaymentScreen(navController: NavController) {
                                     color = Color.White
                                 )
                                 Text(
-                                    text = "35.00€",
+                                    text = "${session.amount}€",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -134,7 +139,7 @@ fun PaymentScreen(navController: NavController) {
                     Spacer(Modifier.weight(1f))
 
                     GameCoachButton(
-                        text = "Simuler le paiement",
+                        text = "Simuler le paiement de ${session.amount}€",
                         onClick = {
                             isProcessing = true
                         },
@@ -143,7 +148,8 @@ fun PaymentScreen(navController: NavController) {
 
                     LaunchedEffect(isProcessing) {
                         if (isProcessing) {
-                            delay(2000)
+                            delay(1500)
+                            MockRepository.markSessionAsPaid(sessionId)
                             isProcessing = false
                             isPaid = true
                         }
@@ -158,18 +164,10 @@ fun PaymentScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    val scale by animateFloatAsState(
-                        targetValue = 1f,
-                        animationSpec = tween(durationMillis = 500),
-                        label = "scale"
-                    )
-
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(120.dp)
-                            .scale(scale),
+                        modifier = Modifier.size(120.dp),
                         tint = Success
                     )
 
@@ -186,7 +184,7 @@ fun PaymentScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Votre session a été payée avec succès. Vous pouvez maintenant accéder à tous les détails de votre session.",
+                        text = "Votre session avec ${session.coachName} a été payée. Vous pouvez maintenant la retrouver dans vos sessions acceptées.",
                         fontSize = 16.sp,
                         color = TextSecondary,
                         textAlign = TextAlign.Center
@@ -195,9 +193,9 @@ fun PaymentScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(48.dp))
 
                     GameCoachButton(
-                        text = "Retour à l'accueil",
+                        text = "Voir mes sessions",
                         onClick = {
-                            navController.navigate(Screen.PlayerHome.route) {
+                            navController.navigate(Screen.PlayerHome.createRoute(email)) {
                                 popUpTo(Screen.PlayerHome.route) { inclusive = true }
                             }
                         }

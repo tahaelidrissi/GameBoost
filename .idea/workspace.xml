@@ -17,12 +17,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4553c8f0-df94-4a0d-aff5-7a769c5e3d49" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/outputs/apk/debug/GameBoost-debug.apk" beforeDir="false" afterPath="$PROJECT_DIR$/build/outputs/apk/debug/GameBoost-debug.apk" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/data/MockRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/data/MockRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/model/Session.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/model/Session.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/AdminHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/AdminHomeScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/ManageUsersScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/ManageUsersScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/PendingCoachesScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/admin/PendingCoachesScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/auth/AuthViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/auth/AuthViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/auth/RegisterScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/auth/RegisterScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachHomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachProfileScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachSessionDetailScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachSessionDetailScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/CoachViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/RevenueScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/coach/RevenueScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/navigation/NavGraph.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/navigation/NavGraph.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/navigation/Screen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/navigation/Screen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/CoachDetailScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/CoachDetailScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/CoachListScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/CoachListScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/PaymentScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/PaymentScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/PlayerChatListScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/PlayerChatListScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/SessionDetailScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gamecoach/ui/player/SessionDetailScreen.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
